@@ -4,15 +4,46 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RollCall</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RollCall.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 20px 0;
+        }
+
+            footer a {
+                color: white;
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 </head>
 <body>
+    <!-- Global Page Loader -->
+    <div id="page-loader">
+        <div class="spinner"></div>
+    </div>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RollCall</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">RollCall</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -26,38 +57,40 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <!-- Right aligned Sign In / Sign Up -->
-                    <!-- Right aligned auth buttons -->
-                    <div class="d-flex">
-                        @if (Context.Session.GetString("UserEmail") == null)
-                        {
-                            <!-- Not logged in -->
-                            <a asp-controller="User" asp-action="SignIn" class="btn btn-outline-primary">Sign In</a>
-                            <a asp-controller="User" asp-action="Choose" class="btn btn-outline-success ms-2">Sign Up</a>
-                        }
-                        else
-                        {
-                            <!-- Logged in -->
-                            <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-danger">Logout</button>
-                            </form>
-                        }
-                    </div>
 
+                    <!-- Right aligned auth buttons -->
+                    @if (Context.Session.GetString("UserEmail") == null)
+                    {
+                        <!-- Not logged in -->
+                        <a asp-controller="User" asp-action="SignIn" class="btn-modern me-2">Sign In</a>
+                        <a asp-controller="User" asp-action="Choose" class="btn-modern">Sign Up</a>
+                    }
+                    else
+                    {
+                        <!-- Logged in -->
+                        <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn-modern">Logout</button>
+                        </form>
+                    }
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container pb-5">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Custom Footer -->
+    <footer class="text-center">
         <div class="container">
-            &copy; 2025 - RollCall - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <p class="mb-1">&copy; 2025 - RollCall</p>
+            <p class="small mb-0">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a> |
+                <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            </p>
         </div>
     </footer>
 
@@ -65,5 +98,30 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Page Loader Script -->
+    <script>
+        // Hide loader after at least 2 seconds on page load
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.getElementById("page-loader").classList.add("hidden");
+            }, 500);
+        });
+
+        // Show loader on navigation (links)
+        document.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", e => {
+                if (link.getAttribute("href")?.startsWith("#") || link.target === "_blank") return;
+                document.getElementById("page-loader").classList.remove("hidden");
+            });
+        });
+
+        // Show loader on form submit
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", () => {
+                document.getElementById("page-loader").classList.remove("hidden");
+            });
+        });
+    </script>
 </body>
 </html>

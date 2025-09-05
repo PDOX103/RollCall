@@ -4,53 +4,91 @@
     ViewData["Title"] = "Student Sign Up";
 }
 
-<div class="container mt-5">
-    <h2>Student Sign Up</h2>
-    <form asp-action="SignUpStudent" asp-controller="User" method="post">
-        <div class="form-group mb-3">
-            <label asp-for="Name"></label>
-            <input asp-for="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" 
+     style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+
+    <!-- Card Wrapper -->
+    <div class="shadow-lg bg-white rounded-4 overflow-hidden animate__animated animate__fadeInUp"
+         style="max-width: 850px; width: 90%; min-height: 500px;">
+
+        <div class="row g-0">
+            <!-- Left Form Section -->
+            <div class="col-md-6 d-flex flex-column justify-content-center p-4">
+                <div class="mb-3 text-center">
+                    <h3 class="fw-bold" style="color:#2c3e50;">🎓 Student Sign Up</h3>
+                    <p class="text-muted small">Create your student account</p>
+                </div>
+
+                <form asp-action="SignUpStudent" asp-controller="User" method="post">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control rounded-pill" placeholder="Full Name" />
+                        <label asp-for="Name"></label>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="StudentId" class="form-control rounded-pill" placeholder="Student ID" />
+                        <label asp-for="StudentId">Student ID</label>
+                        <span asp-validation-for="StudentId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Section" class="form-control rounded-pill" placeholder="Section" />
+                        <label asp-for="Section"></label>
+                        <span asp-validation-for="Section" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Department" class="form-control rounded-pill" placeholder="Department" />
+                        <label asp-for="Department"></label>
+                        <span asp-validation-for="Department" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="PhoneNumber" class="form-control rounded-pill" placeholder="Phone Number" />
+                        <label asp-for="PhoneNumber"></label>
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control rounded-pill" placeholder="Email" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" name="PasswordHash" class="form-control rounded-pill" placeholder="Password" />
+                        <label>Password</label>
+                        <span asp-validation-for="PasswordHash" class="text-danger small"></span>
+                    </div>
+
+                    <input type="hidden" name="Role" value="Student" />
+
+                    <button type="submit" 
+                            class="btn btn-lg w-100 rounded-pill text-white shadow-sm"
+                            style="background: linear-gradient(90deg,#4facfe,#00f2fe); transition:0.3s;"
+                            onmouseover="this.style.opacity='0.9'" 
+                            onmouseout="this.style.opacity='1'">
+                        Sign Up
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">Already have an account?</small>
+                        <a asp-controller="User" asp-action="SignIn" 
+                           class="fw-semibold text-decoration-none" style="color:#4facfe;">Sign In</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Illustration Section -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center p-3" 
+                 style="background: #f9fafc;">
+                <img src="~/images/signup-illustration.svg" alt="Sign Up Illustration"
+                     class="img-fluid animate__animated animate__pulse animate__infinite" 
+                     style="max-height: 350px;" />
+            </div>
         </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="StudentId">Student ID</label>
-            <input asp-for="StudentId" class="form-control" />
-            <span asp-validation-for="StudentId" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Section"></label>
-            <input asp-for="Section" class="form-control" />
-            <span asp-validation-for="Section" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Department"></label>
-            <input asp-for="Department" class="form-control" />
-            <span asp-validation-for="Department" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="PhoneNumber"></label>
-            <input asp-for="PhoneNumber" class="form-control" />
-            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Email"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label>Password</label>
-            <input type="password" name="PasswordHash" class="form-control" />
-            <span asp-validation-for="PasswordHash" class="text-danger"></span>
-        </div>
-
-        <input type="hidden" name="Role" value="Student" />
-
-        <button type="submit" class="btn btn-success">Sign Up</button>
-    </form>
+    </div>
 </div>
