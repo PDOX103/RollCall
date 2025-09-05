@@ -59,13 +59,13 @@ namespace RollCall.Controllers
 
         // ---------------- STUDENT SIGN UP ----------------
         [HttpGet]
-        public IActionResult StudentSignUp()
+        public IActionResult SignUpStudent()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult StudentSignUp(User model)
+        public IActionResult SignUpStudent(User model)
         {
             if (ModelState.IsValid)
             {
