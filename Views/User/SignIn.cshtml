@@ -2,23 +2,92 @@
     ViewData["Title"] = "Sign In";
 }
 
-<h2>Sign In</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-<form asp-action="SignIn" method="post">
-    <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Sign In</button>
-
-    @if (ViewBag.Error != null)
-    {
-        <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background-color: #3d5a80;
+        font-family: 'Poppins', sans-serif;
     }
-</form>
+
+    .full-bg {
+        padding: 20px 15px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-card {
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 700px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .illustration-section {
+        background: #f9fafc;
+    }
+
+    .btn-signin {
+        background: linear-gradient(90deg,#28a745,#218838);
+        color: #fff;
+        transition: 0.3s;
+    }
+
+        .btn-signin:hover {
+            opacity: 0.9;
+        }
+</style>
+
+<div class="full-bg">
+    <div class="form-card animate__animated animate__fadeInUp">
+        <div class="row g-0">
+            <!-- Left Form Section -->
+            <div class="col-md-6 d-flex flex-column justify-content-center p-4">
+                <div class="mb-3 text-center">
+                    <h3 class="fw-bold" style="color:#2c3e50;">🔑 Sign In</h3>
+                    <p class="text-muted small">Enter your credentials to access your account</p>
+                </div>
+
+                <form asp-action="SignIn" method="post">
+                    <div class="form-floating mb-3">
+                        <input type="email" name="email" class="form-control rounded-pill" placeholder="Email" required />
+                        <label>Email</label>
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" name="password" class="form-control rounded-pill" placeholder="Password" required />
+                        <label>Password</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-lg w-100 rounded-pill btn-signin">
+                        Sign In
+                    </button>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+                    }
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">Don't have an account?</small>
+                        <a asp-controller="User" asp-action="Choose"
+                           class="fw-semibold text-decoration-none" style="color:#28a745;">Sign Up</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Illustration Section -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center p-3 illustration-section">
+                <img src="~/images/signin-illustration.svg" alt="Sign In Illustration"
+                     class="img-fluid animate__animated animate__pulse animate__infinite"
+                     style="max-height: 300px;" />
+            </div>
+        </div>
+    </div>
+</div>

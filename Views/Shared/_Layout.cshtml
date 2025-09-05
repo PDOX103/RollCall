@@ -43,13 +43,15 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">RollCall</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="RollCall Logo" width="120" height="35" class="me-2" />
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-sm-flex justify-content-between text-center text-sm-start">
+                    <ul class="navbar-nav flex-grow-1 mb-2 mb-sm-0">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
@@ -59,20 +61,21 @@
                     </ul>
 
                     <!-- Right aligned auth buttons -->
-                    @if (Context.Session.GetString("UserEmail") == null)
-                    {
-                        <!-- Not logged in -->
-                        <a asp-controller="User" asp-action="SignIn" class="btn-modern me-2">Sign In</a>
-                        <a asp-controller="User" asp-action="Choose" class="btn-modern">Sign Up</a>
-                    }
-                    else
-                    {
-                        <!-- Logged in -->
-                        <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
-                            <button type="submit" class="btn-modern">Logout</button>
-                        </form>
-                    }
+                    <div class="auth-buttons mt-2 mt-sm-0">
+                        @if (Context.Session.GetString("UserEmail") == null)
+                        {
+                            <a asp-controller="User" asp-action="SignIn" class="btn-modern me-2">Sign In</a>
+                            <a asp-controller="User" asp-action="Choose" class="btn-modern">Sign Up</a>
+                        }
+                        else
+                        {
+                            <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn-modern">Logout</button>
+                            </form>
+                        }
+                    </div>
                 </div>
+
             </div>
         </nav>
     </header>

@@ -1,326 +1,89 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: #3d5a80; /* Full screen green background */
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .hero-text {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .btn-institute {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+
+            .btn-institute:hover {
+                background-color: #218838;
+            }
+    </style>
 </head>
-
-<style>
-    :root {
-          --primary-color: #3064d3;
-            --secondary-color: #2e51c3;
-            --accent-color: #c8903c;
-        --success-color: #10b981;
-        --danger-color: #ef4444;
-        --dark-color: #1f2937;
-        --light-color: #f8fafc;
-        --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-        color: var(--dark-color);
-    }
-
-    /* Hero Section */
-    .hero-section {
-        background: var(--gradient-1);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        color: white;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="rgba(255,255,255,0.1)" fill-opacity="0.1"><circle cx="20" cy="20" r="2"/><circle cx="40" cy="40" r="2"/></g></svg>') repeat;
-        opacity: 0.3;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
-
-    .hero-title {
-        font-size: 4rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .hero-subtitle {
-        font-size: 1.25rem;
-        margin-bottom: 2rem;
-        opacity: 0.9;
-    }
-
-    .btn-hero {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 30px;
-        font-weight: 600;
-        text-decoration: none;
-        margin: 5px;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-    }
-
-    .btn-hero:hover {
-        background: rgba(255, 255, 255, 0.3);
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    /* Dashboard Cards */
-    .card-modern {
-        background: white;
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        border: none;
-        transition: all 0.3s ease;
-        overflow: hidden;
-    }
-
-    .card-modern:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    /* Metric Cards */
-    .metric-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: var(--shadow);
-        transition: all 0.3s ease;
-        position: relative;
-        margin-bottom: 1.5rem;
-    }
-
-    .metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--gradient-1);
-    }
-
-    .metric-card:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .metric-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-        font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-    }
-
-    .metric-label {
-        color: #64748b;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-    }
-
-    /* Feature Cards */
-    .feature-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        box-shadow: var(--shadow);
-        transition: all 0.3s ease;
-        border-left: 4px solid var(--primary-color);
-    }
-
-    .feature-card:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-        border-left-color: var(--accent-color);
-    }
-
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--primary-color);
-    }
-
-    /* Chart Container - Fixed */
-    .chart-container {
-        position: relative;
-        height: 300px;
-        width: 100%;
-    }
-
-    .chart-container canvas {
-        max-height: 300px;
-    }
-
-    /* Activity Feed */
-    .activity-item {
-        padding: 1rem;
-        border-left: 3px solid var(--primary-color);
-        margin: 0.5rem 0;
-        background: #f8fafc;
-        border-radius: 0 8px 8px 0;
-        transition: all 0.3s ease;
-    }
-
-    .activity-item:hover {
-        background: #e2e8f0;
-        transform: translateX(5px);
-    }
-
-    .activity-time {
-        font-size: 0.75rem;
-        color: var(--accent-color);
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    /* Status Badge */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        margin: 0.25rem 0;
-    }
-
-    .status-online {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success-color);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-
-    .status-warning {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--accent-color);
-        border: 1px solid rgba(245, 158, 11, 0.2);
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 8px;
-        animation: pulse 2s infinite;
-    }
-
-    .status-online .status-dot { background: var(--success-color); }
-    .status-warning .status-dot { background: var(--accent-color); }
-
-    @@keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    /* Section Title */
-    .section-title {
-        color: var(--dark-color);
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        font-size: 1.5rem;
-    }
-
-    .section-title i {
-        margin-right: 0.75rem;
-        color: var(--primary-color);
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .hero-title { font-size: 2.5rem; }
-        .metric-number { font-size: 2rem; }
-        .chart-container { height: 250px; }
-    }
-</style>
-
 <body>
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container hero-content">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <div style="font-size: 4rem; margin-bottom: 1rem;">🏢💻</div>
-                    <h1 class="hero-title">RollCall</h1>
-                    <h2 class="h3 mb-3" style="color: rgba(255,255,255,0.9);">Warehouse Management System</h2>
-                    <p class="hero-subtitle">Advanced Technology Solutions for Computer Accessories, Components, Laptops & Mobile Accessories</p>
-                    
-                    <div class="d-flex flex-wrap">
-                        <a href="#" class="btn-hero">
-                            <i class="fas fa-cubes me-2"></i>Inventory Management
-                        </a>
-                        <a href="#" class="btn-hero">
-                            <i class="fas fa-truck me-2"></i>Product Inflow
-                        </a>
-                        <a href="#" class="btn-hero">
-                            <i class="fas fa-warehouse me-2"></i>Storage Management
-                        </a>
-                        <a href="#" class="btn-hero">
-                            <i class="fas fa-shipping-fast me-2"></i>Dispatch
-                        </a>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div>
+            <div class="hero-text">
+                <h1>Hey! Welcome</h1>
+                <p>Track the attendance with ease</p>
+            </div>
+           <div class="form-container mx-auto">
+                <h3 class="mb-4 text-center">Contact Us</h3>
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter your full name">
                     </div>
-                </div>
-                
-                <div class="col-lg-4">
-                    <div class="card-modern p-4">
-                        <h5 class="section-title text-dark">
-                            <i class="fas fa-server"></i>System Status
-                        </h5>
-                        <div class="status-badge status-online">
-                            <span class="status-dot"></span>
-                            All Systems Online
-                        </div>
-                        <div class="status-badge status-online">
-                            <span class="status-dot"></span>
-                            Database Connected
-                        </div>
-                        <div class="status-badge status-warning">
-                            <span class="status-dot"></span>
-                            Maintenance: 2:00 AM
-                        </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email">
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label for="course" class="form-label">Interested Course</label>
+                        <select class="form-select" id="course">
+                            <option selected>Select a course</option>
+                            <option value="1">Computer Science</option>
+                            <option value="2">Business Administration</option>
+                            <option value="3">Electrical Engineering</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" rows="3" placeholder="Write your message"></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-institute btn-lg">Submit</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
-        
-    </script>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
