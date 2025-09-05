@@ -27,10 +27,23 @@
                         </li>
                     </ul>
                     <!-- Right aligned Sign In / Sign Up -->
+                    <!-- Right aligned auth buttons -->
                     <div class="d-flex">
-                        <a asp-controller="User" asp-action="SignIn" class="btn btn-outline-primary">Sign In</a>
-                        <a asp-controller="User" asp-action="Choose" class="btn btn-outline-success ms-2">Sign Up</a>
+                        @if (Context.Session.GetString("UserEmail") == null)
+                        {
+                            <!-- Not logged in -->
+                            <a asp-controller="User" asp-action="SignIn" class="btn btn-outline-primary">Sign In</a>
+                            <a asp-controller="User" asp-action="Choose" class="btn btn-outline-success ms-2">Sign Up</a>
+                        }
+                        else
+                        {
+                            <!-- Logged in -->
+                            <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger">Logout</button>
+                            </form>
+                        }
                     </div>
+
                 </div>
             </div>
         </nav>
