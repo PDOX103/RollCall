@@ -3,17 +3,110 @@
     ViewData["Title"] = "Teacher Dashboard";
 }
 
-<div class="container mt-5">
-    <h2>Welcome, @Model.Name!</h2>
-    <p>You are logged in as <strong>Teacher</strong>.</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Your Details</h5>
-            <p><strong>Designation:</strong> @Model.Designation</p>
-            <p><strong>Department:</strong> @Model.Department</p>
-            <p><strong>Email:</strong> @Model.Email</p>
-            <p><strong>Phone:</strong> @Model.PhoneNumber</p>
-        </div>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #614385;
+        background: -webkit-linear-gradient(to right, #516395, #614385);
+        background: linear-gradient(to right, #516395, #614385);
+        font-family: 'Poppins', sans-serif;
+        color: #2c3e50;
+        overflow-x: hidden;
+    }
+
+    .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .content {
+        flex-grow: 1;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 1rem;
+        margin: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Hamburger toggle button */
+    .toggle-btn {
+        position: fixed;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        border: none;
+        padding: 12px 14px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1102;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @@media (min-width: 768px) {
+        .toggle-btn {
+            display: none;
+        }
+    }
+
+    /* Overlay */
+    .sidebar-overlay.show {
+        display: block;
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    @Html.Partial("TeacherSidebar")
+
+    <!-- Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Content -->
+    <div class="content">
+        <button class="toggle-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h2>Welcome, @Model?.Name</h2>
+        <p>This is your Teacher Dashboard. Here you can manage courses, view attendance, and more.</p>
     </div>
 </div>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const modeBtn = document.querySelector(".mode-btn");
+
+    // Load saved mode
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedMode = localStorage.getItem("darkMode");
+        if (savedMode === "true") {
+            document.body.classList.add("dark-mode");
+            modeBtn.textContent = "☀️ Light Mode";
+        } else {
+            modeBtn.textContent = "🌙 Dark Mode";
+        }
+    });
+
+    function toggleSidebar() {
+        sidebar.classList.toggle("sidebar-hidden");
+        sidebar.classList.toggle("animate__slideInLeft");
+        overlay.classList.toggle("show");
+    }
+
+    function toggleMode() {
+        document.body.classList.toggle("dark-mode");
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", isDark);
+        modeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+</script>

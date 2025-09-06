@@ -3,6 +3,7 @@
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     body, html {
@@ -91,3 +92,20 @@
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 Popup -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var message = '@TempData["Message"]';
+        var type = '@TempData["MessageType"]';
+
+        if (message && type) {
+            Swal.fire({
+                icon: type,
+                title: message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    });
+</script>
