@@ -14,16 +14,28 @@
     <link rel="stylesheet" href="~/RollCall.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-
     <style>
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
             font-family: 'Poppins', sans-serif !important;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+        }
+
+        .container.pb-5 {
+            flex: 1 0 auto; /* Allow container to grow and take available space */
         }
 
         footer {
             background: linear-gradient(135deg, #4facfe, #00f2fe);
             color: white;
             padding: 20px 0;
+            flex-shrink: 0; /* Prevent footer from shrinking */
         }
 
             footer a {
@@ -75,15 +87,12 @@
                             <a asp-controller="User" asp-action="Profile" class="btn btn-light rounded-circle me-2" title="My Profile">
                                 <i class="bi bi-person-circle fs-4"></i>
                             </a>
-
-
                             <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
                                 <button type="submit" class="btn-modern">Logout</button>
                             </form>
                         }
                     </div>
                 </div>
-
             </div>
         </nav>
     </header>

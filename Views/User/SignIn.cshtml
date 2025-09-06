@@ -15,10 +15,10 @@
 
     .full-bg {
         padding: 20px 15px;
-        min-height: 100vh;
+        min-height: 50vh;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column; /* Stack content vertically */
+        justify-content: flex-start; /* Align content at the top */
     }
 
     .form-card {
@@ -28,8 +28,8 @@
         max-width: 700px;
         width: 100%;
         overflow: hidden;
+        margin: 20px auto 0; /* Add top margin for spacing from top */
     }
-
     .illustration-section {
         background: #f9fafc;
     }

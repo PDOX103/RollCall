@@ -13,10 +13,10 @@
     }
 
     .full-bg {
-        min-height: 100vh;
+        min-height: 50vh; /* Ensure full viewport height */
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column; /* Stack content vertically */
+        justify-content: flex-start; /* Align content at the top */
         padding: 20px;
     }
 
@@ -29,6 +29,7 @@
         overflow: hidden;
         text-align: center;
         padding: 40px 30px;
+        margin: 20px auto 0; /* Add top margin for spacing from top */
     }
 
     .btn-choice {

@@ -14,72 +14,50 @@
         body, html {
             height: 100%;
             margin: 0;
-            background-color: #3d5a80; /* Full screen green background */
+            background-color: #3d5a80; /* Full screen background */
             font-family: 'Poppins', sans-serif;
         }
 
-        .form-container {
+        .image-container {
             background-color: #ffffff;
             border-radius: 15px;
             padding: 40px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            max-width: 450px;
+            max-width: 1000px;
             width: 100%;
+            text-align: center;
+            margin: 20px auto 0; /* Margin to separate from top */
         }
 
         .hero-text {
             color: #fff;
             text-align: center;
-            margin-bottom: 40px;
+            margin: 20px auto; /* Margin to position below top */
+            max-width: 1000px;
         }
 
-        .btn-institute {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
+        .featured-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
         }
 
-            .btn-institute:hover {
-                background-color: #218838;
-            }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px; /* Space from top of page */
+        }
     </style>
 </head>
 <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div>
-            <div class="hero-text">
-                <h1>Hey! Welcome</h1>
-                <p>Track the attendance with ease</p>
-            </div>
-           <div class="form-container mx-auto">
-                <h3 class="mb-4 text-center">Contact Us</h3>
-                <form>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Enter your full name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter your email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="course" class="form-label">Interested Course</label>
-                        <select class="form-select" id="course">
-                            <option selected>Select a course</option>
-                            <option value="1">Computer Science</option>
-                            <option value="2">Business Administration</option>
-                            <option value="3">Electrical Engineering</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" rows="3" placeholder="Write your message"></textarea>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-institute btn-lg">Submit</button>
-                    </div>
-                </form>
-            </div>
+    <div class="content-wrapper">
+        <div class="hero-text">
+            <h1>Hey! Welcome</h1>
+            <p>Track the attendance with ease</p>
+        </div>
+        <div class="image-container mx-auto">
+            <img src="~/images/Classroom.png" alt="Attendance Tracking" class="featured-image">
         </div>
     </div>
 
