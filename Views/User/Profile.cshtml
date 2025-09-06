@@ -1,4 +1,5 @@
 ﻿@model RollCall.Models.User
+
 @{
     ViewData["Title"] = "My Profile";
 }
@@ -9,7 +10,7 @@
     body, html {
         height: 100%;
         margin: 0;
-        background: #4facfe; /* fallback */
+        background: #4facfe; 
         background: -webkit-linear-gradient(to right, #00f2fe, #4facfe);
         background: linear-gradient(to right, #00f2fe, #4facfe);
         font-family: 'Poppins', sans-serif;
@@ -17,10 +18,10 @@
 
     .full-bg {
         padding: 20px 15px;
-        min-height: 100vh;
+        min-height: 50vh;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column; 
+        justify-content: flex-start; 
     }
 
     .profile-card {
@@ -30,6 +31,7 @@
         max-width: 800px;
         width: 100%;
         overflow: hidden;
+        margin: 20px auto 0; 
     }
 
     .info-section {
@@ -59,7 +61,6 @@
                 <div>
                     @if (Model.Role == "Student")
                     {
-
                         <p><strong>Name:</strong> @Model.Name</p>
                         <p><strong>Student ID:</strong> @Model.StudentId</p>
                         <p><strong>Section:</strong> @Model.Section</p>
@@ -85,13 +86,10 @@
                         <hr />
                         <p><strong>Email:</strong> @Model.Email</p>
                         <p><strong>Phone:</strong> @Model.PhoneNumber</p>
-                        
                     }
-
-                    
                 </div>
 
-                <button class="btn btn-edit rounded-pill mt-3 w-70">
+                <button class="btn btn-edit rounded-pill mt-3 w-100">
                     ✏️ Edit Profile
                 </button>
             </div>

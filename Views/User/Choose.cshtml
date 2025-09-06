@@ -13,10 +13,10 @@
     }
 
     .full-bg {
-        min-height: 50vh; /* Ensure full viewport height */
+        min-height: 50vh;
         display: flex;
-        flex-direction: column; /* Stack content vertically */
-        justify-content: flex-start; /* Align content at the top */
+        flex-direction: column;
+        justify-content: flex-start; 
         padding: 20px;
     }
 
@@ -28,22 +28,25 @@
         width: 100%;
         overflow: hidden;
         text-align: center;
-        padding: 40px 30px;
-        margin: 20px auto 0; /* Add top margin for spacing from top */
+        padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 25px); 
+        margin: 20px auto 0;
     }
 
     .btn-choice {
-        padding: 12px 20px;
-        border-radius: 50px;
-        font-size: 1.1rem;
+        padding: clamp(6px, 1.5vw, 8px) clamp(15px, 3vw, 20px); 
+        border-radius: 25px;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
         font-weight: 600;
         transition: 0.3s;
-        width: 100%;
-        margin-bottom: 15px;
+        width: clamp(180px, 45vw, 250px);
+        max-width: 90%;
+        margin: 0 auto 10px; 
+        display: block; 
+        white-space: nowrap;
     }
 
     .btn-student {
-        background: linear-gradient(90deg,#28a745,#218838);
+        background: linear-gradient(90deg, #28a745, #218838);
         color: #fff;
     }
 
@@ -52,13 +55,21 @@
         }
 
     .btn-teacher {
-        background: linear-gradient(90deg,#ff9a9e,#fad0c4);
+        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
         color: #fff;
     }
 
         .btn-teacher:hover {
             opacity: 0.9;
         }
+
+    h3 {
+        font-size: clamp(1.5rem, 4vw, 1.8rem); 
+    }
+
+    p {
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    }
 </style>
 
 <div class="full-bg">
