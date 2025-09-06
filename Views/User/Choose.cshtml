@@ -2,9 +2,77 @@
     ViewData["Title"] = "Sign Up";
 }
 
-<h2>Sign Up As</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-<div class="mt-3">
-    <a asp-action="SignUpStudent" class="btn btn-success btn-lg">Sign Up as Student</a>
-    <a asp-action="TeacherSignUp" class="btn btn-info btn-lg ml-3">Sign Up as Teacher</a>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .full-bg {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        padding: 40px 30px;
+    }
+
+    .btn-choice {
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: 0.3s;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .btn-student {
+        background: linear-gradient(90deg,#28a745,#218838);
+        color: #fff;
+    }
+
+        .btn-student:hover {
+            opacity: 0.9;
+        }
+
+    .btn-teacher {
+        background: linear-gradient(90deg,#ff9a9e,#fad0c4);
+        color: #fff;
+    }
+
+        .btn-teacher:hover {
+            opacity: 0.9;
+        }
+</style>
+
+<div class="full-bg">
+    <div class="form-card animate__animated animate__fadeInUp">
+        <h3 class="fw-bold mb-3" style="color:#2c3e50;">👥 Sign Up As</h3>
+        <p class="text-muted mb-4">Choose your role to continue</p>
+
+        <a asp-action="SignUpStudent" asp-controller="User"
+           class="btn btn-choice btn-student">
+            🎓 Sign Up as Student
+        </a>
+
+        <a asp-action="TeacherSignUp" asp-controller="User"
+           class="btn btn-choice btn-teacher">
+            👨‍🏫 Sign Up as Teacher
+        </a>
+    </div>
 </div>
