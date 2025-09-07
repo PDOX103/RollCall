@@ -9,13 +9,16 @@
     body, html {
         height: 100%;
         margin: 0;
-        background-color: #3d5a80;
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
         font-family: 'Poppins', sans-serif;
     }
 
     .full-bg {
         padding: 20px 15px;
-        min-height: 50vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -35,7 +38,9 @@
     }
 
     .btn-signin {
-        background: linear-gradient(90deg,#28a745,#218838);
+        background: #3a7bd5; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #3a6073, #3a7bd5); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #3a6073, #3a7bd5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         color: #fff;
         transition: 0.3s;
     }
@@ -51,7 +56,7 @@
             <!-- Left Form Section -->
             <div class="col-md-6 d-flex flex-column justify-content-center p-4">
                 <div class="mb-3 text-center">
-                    <h3 class="fw-bold" style="color:#2c3e50;">🔑 Sign In</h3>
+                    <h3 class="fw-bold" style="color:#2c3e50;">Sign In</h3>
                     <p class="text-muted small">Enter your credentials to access your account</p>
                 </div>
 
@@ -78,7 +83,7 @@
                     <div class="text-center mt-3">
                         <small class="text-muted">Don't have an account?</small>
                         <a asp-controller="User" asp-action="Choose"
-                           class="fw-semibold text-decoration-none" style="color:#28a745;">Sign Up</a>
+                           class="fw-semibold text-decoration-none" style="color:#3a7bd5;">Sign Up</a>
                     </div>
                 </form>
             </div>

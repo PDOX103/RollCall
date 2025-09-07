@@ -8,12 +8,16 @@
     body, html {
         height: 100%;
         margin: 0;
-        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+
         font-family: 'Poppins', sans-serif;
     }
 
     .full-bg {
-        min-height: 50vh;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: flex-start; 
@@ -46,7 +50,10 @@
     }
 
     .btn-student {
-        background: linear-gradient(90deg, #28a745, #218838);
+        background: #3a7bd5; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #3a6073, #3a7bd5); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #3a6073, #3a7bd5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
         color: #fff;
     }
 
@@ -55,7 +62,9 @@
         }
 
     .btn-teacher {
-        background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+        background: #3a7bd5; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #3a6073, #3a7bd5); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #3a6073, #3a7bd5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         color: #fff;
     }
 
@@ -74,17 +83,17 @@
 
 <div class="full-bg">
     <div class="form-card animate__animated animate__fadeInUp">
-        <h3 class="fw-bold mb-3" style="color:#2c3e50;">👥 Sign Up As</h3>
+        <h3 class="fw-bold mb-3" style="color:#2c3e50;">Sign Up As</h3>
         <p class="text-muted mb-4">Choose your role to continue</p>
 
         <a asp-action="SignUpStudent" asp-controller="User"
            class="btn btn-choice btn-student">
-            🎓 Sign Up as Student
+            Sign Up as Student
         </a>
 
         <a asp-action="TeacherSignUp" asp-controller="User"
            class="btn btn-choice btn-teacher">
-            👨‍🏫 Sign Up as Teacher
+            Sign Up as Teacher
         </a>
     </div>
 </div>
