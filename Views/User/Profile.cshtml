@@ -1,0 +1,121 @@
+﻿@model RollCall.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .full-bg {
+        padding: 20px 15px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column; 
+        justify-content: flex-start; 
+    }
+
+    .profile-card {
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 800px;
+        width: 100%;
+        overflow: hidden;
+        margin: 20px auto 0; 
+    }
+
+    .info-section {
+        background: #f9fafc;
+    }
+
+    .btn-edit {
+        background: linear-gradient(90deg,#43cea2,#185a9d);
+        color: #fff;
+        transition: 0.3s;
+    }
+
+        .btn-edit:hover {
+            opacity: 0.9;
+        }
+</style>
+
+<div class="full-bg">
+    <div class="profile-card animate__animated animate__fadeInUp">
+        <div class="row g-0">
+            <!-- Left Info Section -->
+            <div class="col-md-6 d-flex flex-column justify-content-center p-4">
+                <div class="mb-3 text-center">
+                    <h3 class="fw-bold" style="color:#2c3e50;">👤 My Profile</h3>
+                </div>
+
+                <div>
+                    @if (Model.Role == "Student")
+                    {
+                        <p><strong>Name:</strong> @Model.Name</p>
+                        <p><strong>Student ID:</strong> @Model.StudentId</p>
+                        <p><strong>Section:</strong> @Model.Section</p>
+                        <p><strong>Department:</strong> @Model.Department</p>
+                        <hr />
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    }
+                    else if (Model.Role == "Teacher")
+                    {
+                        <p><strong>Name:</strong> @Model.Name</p>
+                        <p><strong>Designation:</strong> @Model.Designation</p>
+                        <p><strong>Department:</strong> @Model.Department</p>
+                        <hr />
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    }
+                    else if (Model.Role == "Admin")
+                    {
+                        <p class="text-muted text-sm-center">You have full system access.</p>
+                        <hr />
+                        <p><strong>Name:</strong> @Model.Name</p>
+                        <hr />
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    }
+                </div>
+
+                <button class="btn btn-edit rounded-pill mt-3 w-100">
+                    ✏️ Edit Profile
+                </button>
+            </div>
+
+            <!-- Right Illustration -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center p-3 info-section">
+                @if (Model.Role == "Student")
+                {
+                    <img src="~/images/student-profile.svg" alt="Student Illustration"
+                         class="img-fluid animate__animated animate__pulse animate__infinite"
+                         style="max-height: 280px;" />
+                }
+                else if (Model.Role == "Teacher")
+                {
+                    <img src="~/images/teacher-profile.svg" alt="Teacher Illustration"
+                         class="img-fluid animate__animated animate__pulse animate__infinite"
+                         style="max-height: 280px;" />
+                }
+                else if (Model.Role == "Admin")
+                {
+                    <img src="~/images/admin-profile.svg" alt="Admin Illustration"
+                         class="img-fluid animate__animated animate__pulse animate__infinite"
+                         style="max-height: 280px;" />
+                }
+            </div>
+        </div>
+    </div>
+</div>

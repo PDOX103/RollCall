@@ -4,47 +4,133 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - RollCall</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RollCall.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif !important;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure body takes at least full viewport height */
+        }
+
+        .container.pb-5 {
+            flex: 1 0 auto; /* Allow container to grow and take available space */
+        }
+
+        .navbar {
+            background: #ECE9E6; /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+
+        .navbar-brand, .nav-link {
+            color: black !important; /* White text for readability */
+        }
+
+        
+
+        .btn-light.rounded-circle {
+            background-color: #fff; /* White background for profile icon */
+            color: #3d5a80; /* Blue icon color to match navbar */
+        }
+
+        footer {
+            background: #ECE9E6; /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+            color: black;
+            padding: 20px 0;
+            flex-shrink: 0; /* Prevent footer from shrinking */
+        }
+
+            footer a {
+                color: black;
+                text-decoration: none;
+            }
+
+                footer a:hover {
+                    text-decoration: underline;
+                }
+    </style>
 </head>
 <body>
+    <!-- Global Page Loader -->
+    <div id="page-loader">
+        <div class="spinner"></div>
+    </div>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RollCall</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="RollCall Logo" width="120" height="35" class="me-2" />
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse d-sm-flex justify-content-between text-center text-sm-start">
+                    <ul class="navbar-nav flex-grow-1 mb-2 mb-sm-0">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ContactUs">Contact</a>
                         </li>
                     </ul>
-                    <!-- Right aligned Sign In / Sign Up -->
-                    <div class="d-flex">
-                        <a asp-controller="User" asp-action="SignIn" class="btn btn-outline-primary">Sign In</a>
-                        <a asp-controller="User" asp-action="Choose" class="btn btn-outline-success ms-2">Sign Up</a>
+
+                    <!-- Right aligned auth buttons -->
+                    <div class="auth-buttons mt-2 mt-sm-0">
+                        @if (Context.Session.GetString("UserEmail") == null)
+                        {
+                            <a asp-controller="User" asp-action="SignIn" class="btn-modern me-2">Sign In</a>
+                            <a asp-controller="User" asp-action="Choose" class="btn-modern">Sign Up</a>
+                        }
+                        else
+                        {
+                            <!-- Profile Icon -->
+                            <a asp-controller="User" asp-action="Profile" class="btn btn-group rounded-circle me-2" title="My Profile">
+                                <i class="bi bi-person-circle fs-4"></i>
+                            </a>
+                            <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn-modern">Logout</button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container pb-5">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <!-- Custom Footer -->
+    <footer class="text-center">
         <div class="container">
-            &copy; 2025 - RollCall - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <p class="mb-1">&copy; 2025 - RollCall</p>
+            <p class="small mb-0">
+                <a asp-area="" asp-controller="Home" asp-action="ContactUs">Contact</a> |
+                <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            </p>
         </div>
     </footer>
 
@@ -52,5 +138,30 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Page Loader Script -->
+    <script>
+        // Hide loader after at least 2 seconds on page load
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.getElementById("page-loader").classList.add("hidden");
+            }, 500);
+        });
+
+        // Show loader on navigation (links)
+        document.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", e => {
+                if (link.getAttribute("href")?.startsWith("#") || link.target === "_blank") return;
+                document.getElementById("page-loader").classList.remove("hidden");
+            });
+        });
+
+        // Show loader on form submit
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", () => {
+                document.getElementById("page-loader").classList.remove("hidden");
+            });
+        });
+    </script>
 </body>
 </html>

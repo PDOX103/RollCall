@@ -2,9 +2,98 @@
     ViewData["Title"] = "Sign Up";
 }
 
-<h2>Sign Up As</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-<div class="mt-3">
-    <a asp-action="SignUpStudent" class="btn btn-success btn-lg">Sign Up as Student</a>
-    <a asp-action="SignUpTeacher" class="btn btn-info btn-lg ml-3">Sign Up as Teacher</a>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .full-bg {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; 
+        padding: 20px;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 25px); 
+        margin: 20px auto 0;
+    }
+
+    .btn-choice {
+        padding: clamp(6px, 1.5vw, 8px) clamp(15px, 3vw, 20px); 
+        border-radius: 25px;
+        font-size: clamp(0.9rem, 2.5vw, 1rem);
+        font-weight: 600;
+        transition: 0.3s;
+        width: clamp(180px, 45vw, 250px);
+        max-width: 90%;
+        margin: 0 auto 10px; 
+        display: block; 
+        white-space: nowrap;
+    }
+
+    .btn-student {
+        background: #3a7bd5; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #3a6073, #3a7bd5); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #3a6073, #3a7bd5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+        color: #fff;
+    }
+
+        .btn-student:hover {
+            opacity: 0.9;
+        }
+
+    .btn-teacher {
+        background: #3a7bd5; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #3a6073, #3a7bd5); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #3a6073, #3a7bd5); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        color: #fff;
+    }
+
+        .btn-teacher:hover {
+            opacity: 0.9;
+        }
+
+    h3 {
+        font-size: clamp(1.5rem, 4vw, 1.8rem); 
+    }
+
+    p {
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    }
+</style>
+
+<div class="full-bg">
+    <div class="form-card animate__animated animate__fadeInUp">
+        <h3 class="fw-bold mb-3" style="color:#2c3e50;">Sign Up As</h3>
+        <p class="text-muted mb-4">Choose your role to continue</p>
+
+        <a asp-action="SignUpStudent" asp-controller="User"
+           class="btn btn-choice btn-student">
+            Sign Up as Student
+        </a>
+
+        <a asp-action="TeacherSignUp" asp-controller="User"
+           class="btn btn-choice btn-teacher">
+            Sign Up as Teacher
+        </a>
+    </div>
 </div>
