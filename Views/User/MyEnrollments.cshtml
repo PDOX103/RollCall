@@ -1,4 +1,4 @@
-﻿@model List<RollCall.Models.Enrollment>
+﻿@model List<RollCall.Models.ViewModels.StudentEnrollmentVM>
 
 @{
     ViewData["Title"] = "My Enrollments";
@@ -57,16 +57,32 @@
 
     @if (Model.Any())
     {
-        foreach (var enrollment in Model)
+        @foreach (var enrollment in Model)
         {
             <div class="enrollment-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h4 class="mb-1">@enrollment.Course.Name</h4>
-                        <p class="text-muted mb-1">Taught by: @enrollment.Course.Teacher.Name</p>
+                        <h4 class="mb-1">@enrollment.CourseName</h4>
+                        <p class="text-muted mb-1">Taught by: @enrollment.TeacherName</p>
                         <small class="text-muted">Enrolled: @enrollment.EnrolledAt.ToString("MMM dd, yyyy")</small>
                     </div>
-                    <span class="badge bg-success">Enrolled</span>
+                    <div class="text-end">
+                        @if (enrollment.Grade.HasValue)
+                        {
+                            <div class="mb-2">
+                                <span class="badge @(enrollment.Grade.Value < 2.0 ? "bg-danger" : "bg-success")">
+                                    @(enrollment.Grade.Value < 2.0 ? "FAIL" : "PASS")
+                                </span>
+                                <span class="ms-2">Grade: @enrollment.Grade.Value</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">No Grade</span>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         }

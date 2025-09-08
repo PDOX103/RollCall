@@ -21,5 +21,7 @@ namespace RollCall.Models
         public Course Course { get; set; } = null!;
 
         public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
+
+        public float? Grade { get; set; }
     }
 }
