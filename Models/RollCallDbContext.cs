@@ -11,6 +11,10 @@ namespace RollCall.Models
 
         public DbSet<Enrollment> Enrollments { get; set; }
 
+        public DbSet<AttendanceSession> AttendanceSessions { get; set; }
+
+        public DbSet<AttendanceRecord> AttendanceRecords { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Enforce unique email at DB level
@@ -28,6 +32,11 @@ namespace RollCall.Models
                     .HasIndex(e => new { e.StudentId, e.CourseId })
                     .IsUnique();
 
+          
+
+            modelBuilder.Entity<AttendanceRecord>()
+               .HasIndex(r => new { r.SessionId, r.StudentId })
+               .IsUnique();
             base.OnModelCreating(modelBuilder);
         }
     }

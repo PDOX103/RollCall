@@ -510,5 +510,274 @@ namespace RollCall.Controllers
             return View(viewModel);
         }
 
+        //Start Session
+
+        [HttpGet]
+        public IActionResult StartSession(int courseId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var course = _context.Courses.FirstOrDefault(c => c.Id == courseId && c.Teacher.Email == userEmail);
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            return View(new AttendanceSession { CourseId = courseId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StartSession(AttendanceSession model)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "Teacher not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            var session = new AttendanceSession
+            {
+                CourseId = model.CourseId,
+                IsActive = true
+            };
+
+            _context.AttendanceSessions.Add(session);
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Session started successfully!";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("SessionDetails", new { sessionId = session.Id });
+        }
+
+
+        //End Session
+
+        [HttpPost]
+        public async Task<IActionResult> EndSession(int sessionId)
+        {
+            var session = await _context.AttendanceSessions.FindAsync(sessionId);
+            if (session == null || !session.IsActive)
+            {
+                TempData["ToastMessage"] = "Session not found or already ended.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            session.EndTime = DateTime.UtcNow;
+            session.IsActive = false;
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Session ended successfully!";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("SessionDetails", new { sessionId });
+        }
+
+
+        
+
+        //List Active Sessions
+
+        [HttpGet]
+        public async Task<IActionResult> ActiveSessions()
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (student == null)
+            {
+                TempData["ToastMessage"] = "Student not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Get courses the student is enrolled in
+            var enrollments = await _context.Enrollments
+                .Where(e => e.StudentId == student.Id)
+                .Select(e => e.CourseId)
+                .ToListAsync();
+
+            // Get active sessions for those courses
+            var activeSessions = await _context.AttendanceSessions
+                .Where(s => enrollments.Contains(s.CourseId) && s.IsActive)
+                .Include(s => s.Course)
+                .ToListAsync();
+
+            return View(activeSessions);
+        }
+
+
+        //Mark Attendance
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAttendance(int sessionId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var student = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (student == null)
+            {
+                TempData["ToastMessage"] = "Student not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            var session = await _context.AttendanceSessions.FindAsync(sessionId);
+            if (session == null || !session.IsActive)
+            {
+                TempData["ToastMessage"] = "Session not found or inactive.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("ActiveSessions");
+            }
+
+            var existingRecord = await _context.AttendanceRecords
+                .FirstOrDefaultAsync(r => r.SessionId == sessionId && r.StudentId == student.Id);
+
+            if (existingRecord != null)
+            {
+                TempData["ToastMessage"] = "You have already marked your attendance for this session.";
+                TempData["ToastType"] = "warning";
+                return RedirectToAction("ActiveSessions");
+            }
+
+            var record = new AttendanceRecord
+            {
+                SessionId = sessionId,
+                StudentId = student.Id
+            };
+
+            _context.AttendanceRecords.Add(record);
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Attendance marked successfully!";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("ActiveSessions");
+        }
+
+
+        //Pdf of Attendance Record
+
+        [HttpGet]
+        public async Task<IActionResult> GeneratePDF(int sessionId)
+        {
+            var session = await _context.AttendanceSessions
+                .Include(s => s.Course)
+                .FirstOrDefaultAsync(s => s.Id == sessionId);
+
+            if (session == null)
+            {
+                TempData["ToastMessage"] = "Session not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            var records = await _context.AttendanceRecords
+                .Where(r => r.SessionId == sessionId)
+                .Include(r => r.Student)
+                .OrderBy(r => r.MarkedAt)
+                .ToListAsync();
+
+            var document = new AttendancePDFDocument(session, records);
+            var pdfBytes = document.Generate();
+
+            return File(pdfBytes, "application/pdf", $"Attendance_{session.Course.Name}_{session.StartTime:yyyyMMdd}.pdf");
+        }
+
+        //Course Sessions
+
+        // UserController.cs
+        [HttpGet]
+        public async Task<IActionResult> CourseSessions(int courseId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == courseId && c.Teacher.Email == userEmail);
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            var sessions = await _context.AttendanceSessions
+                .Where(s => s.CourseId == courseId)
+                .OrderByDescending(s => s.StartTime)
+                .ToListAsync();
+
+            var viewModel = new CourseSessionsVM
+            {
+                Course = course,
+                Sessions = sessions
+            };
+
+            return View(viewModel);
+        }
+
+        //Session details
+
+        // UserController.cs
+        [HttpGet]
+        public async Task<IActionResult> SessionDetails(int sessionId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var session = await _context.AttendanceSessions
+                .Include(s => s.Course)
+                .FirstOrDefaultAsync(s => s.Id == sessionId && s.Course.Teacher.Email == userEmail);
+            if (session == null)
+            {
+                TempData["ToastMessage"] = "Session not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            var records = await _context.AttendanceRecords
+                .Where(r => r.SessionId == sessionId)
+                .Include(r => r.Student)
+                .OrderBy(r => r.MarkedAt)
+                .ToListAsync();
+
+            var viewModel = new SessionDetailsVM
+            {
+                Session = session,
+                Records = records
+            };
+
+            return View(viewModel);
+        }
+
+
+
+
+
+
+
+
+
+
     }
 }

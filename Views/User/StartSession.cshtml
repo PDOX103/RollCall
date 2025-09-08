@@ -1,0 +1,15 @@
+﻿@model RollCall.Models.AttendanceSession
+@{
+    ViewData["Title"] = "Start Attendance Session";
+}
+<div class="form-card">
+    <h3 class="text-center mb-4">Start New Attendance Session</h3>
+    <form asp-action="StartSession" method="post">
+        <input type="hidden" asp-for="CourseId" />
+        <div class="form-group mb-3">
+            <label asp-for="CourseId" class="form-label">Course</label>
+            <input asp-for="CourseId" class="form-control" readonly />
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Start Session</button>
+    </form>
+</div>
