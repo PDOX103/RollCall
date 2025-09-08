@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RollCall.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using RollCall.Models;
+using RollCall.Models.ViewModels;
 
 namespace RollCall.Controllers
 {
@@ -445,6 +446,68 @@ namespace RollCall.Controllers
                 .ToListAsync();
 
             return View(enrollments);
+        }
+
+        // ---------------- VIEW COURSE ENROLLMENTS ----------------
+        public async Task<IActionResult> CourseEnrollments(int courseId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Get the teacher
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "Teacher not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Get the course and verify it belongs to this teacher
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == courseId && c.TeacherId == teacher.Id);
+
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            // Get enrolled students with their details
+            var enrolledStudents = await _context.Enrollments
+                .Where(e => e.CourseId == courseId)
+                .Include(e => e.Student)
+                .OrderBy(e => e.Student.Name)
+                .Select(e => new EnrolledStudent
+                {
+                    StudentId = e.Student.Id,
+                    Name = e.Student.Name,
+                    Email = e.Student.Email,
+                    PhoneNumber = e.Student.PhoneNumber ?? "N/A",
+                    StudentIdNumber = e.Student.StudentId ?? "N/A",
+                    Section = e.Student.Section ?? "N/A",
+                    Department = e.Student.Department ?? "N/A",
+                    EnrolledAt = e.EnrolledAt
+                })
+                .ToListAsync();
+
+            var viewModel = new CourseEnrollmentsVM
+            {
+                CourseId = course.Id,
+                CourseName = course.Name,
+                CourseCode = course.Code,
+                EnrolledStudents = enrolledStudents
+            };
+
+            return View(viewModel);
         }
 
     }
