@@ -1,0 +1,86 @@
+﻿@model RollCall.Models.Course
+@{
+    ViewData["Title"] = "Create Course";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .full-bg {
+        padding: 20px 15px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .form-card {
+        background-color: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+        margin: 20px auto 0;
+        padding: 30px;
+    }
+
+    .btn-create {
+        background: linear-gradient(to right, #3a6073, #3a7bd5);
+        color: #fff;
+        transition: 0.3s;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        width: 100%;
+        font-weight: 600;
+    }
+
+        .btn-create:hover {
+            opacity: 0.9;
+            color: #fff;
+        }
+</style>
+
+<div class="full-bg">
+    <div class="form-card animate__animated animate__fadeInUp">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold" style="color:#2c3e50;">Create a New Course</h3>
+            <p class="text-muted">Enter a name for your course. A unique enrollment code will be generated automatically.</p>
+        </div>
+
+        <form asp-action="CreateCourse" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- The form now binds directly to the Course.Name property -->
+            <div class="form-floating mb-4">
+                <input asp-for="Name" class="form-control rounded-pill" placeholder="Introduction to Programming" />
+                <label asp-for="Name">Course Name</label>
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-create btn-lg">Create Course</button>
+
+            <div class="text-center mt-3">
+                <a asp-controller="User" asp-action="TeacherPage" class="text-decoration-none" style="color:#3a7bd5;">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

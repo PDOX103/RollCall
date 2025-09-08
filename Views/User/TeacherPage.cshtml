@@ -3,111 +3,90 @@
     ViewData["Title"] = "Teacher Dashboard";
 }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
     body, html {
         height: 100%;
         margin: 0;
-        background: #0f0c29; /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29); /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
         font-family: 'Poppins', sans-serif;
-        color: #2c3e50;
-        overflow-x: hidden;
-    }
-
-    .dashboard-container {
-        display: flex;
-        min-height: 100vh;
+        color: #fff; /* Changed text color to white for better contrast on dark bg */
     }
 
     .content {
-        flex-grow: 1;
         padding: 30px;
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.1); /* Lighter, transparent background */
         border-radius: 1rem;
         margin: 20px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        position: relative;
-        z-index: 1;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px); /* Adds a glassmorphism effect */
     }
 
-    /* Hamburger toggle button */
-    .toggle-btn {
-        position: fixed;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #fff;
-        border: none;
-        padding: 12px 14px;
-        border-radius: 50%;
-        cursor: pointer;
-        z-index: 1102;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    @@media (min-width: 768px) {
-        .toggle-btn {
-            display: none;
-        }
-    }
-
-    /* Overlay */
-    .sidebar-overlay.show {
-        display: block;
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50; /* Dark text for card content */
     }
 </style>
 
-<div class="dashboard-container">
-    <!-- Sidebar -->
-    @Html.Partial("TeacherSidebar")
-
-    <!-- Overlay -->
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-
+<div>
     <!-- Content -->
     <div class="content">
-        <button class="toggle-btn" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <h2>Welcome, @Model?.Name</h2>
+        <h2>Welcome, @Model?.Name!</h2>
         <p>This is your Teacher Dashboard. Here you can manage courses, view attendance, and more.</p>
+
+        <!-- Course Management Cards -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-plus-circle fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Create New Course</h5>
+                        <p class="card-text">Generate a unique enrollment code for your students.</p>
+                        <a asp-controller="User" asp-action="CreateCourse" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create Course
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x mb-3 text-success"></i>
+                        <h5 class="card-title">View My Courses</h5>
+                        <p class="card-text">See all your created courses and enrollment codes.</p>
+                        <a asp-controller="User" asp-action="MyCourses" class="btn btn-success">
+                            <i class="fas fa-eye"></i> View Courses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Course Management Cards -->
+
     </div>
 </div>
 
+<!-- You can remove the entire script block below if you don't need dark mode functionality -->
 <script>
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("sidebarOverlay");
+    // Optional: Keep this if you plan to add a dark mode toggle button elsewhere
     const modeBtn = document.querySelector(".mode-btn");
-
-    // Load saved mode
     document.addEventListener("DOMContentLoaded", () => {
         const savedMode = localStorage.getItem("darkMode");
         if (savedMode === "true") {
             document.body.classList.add("dark-mode");
-            modeBtn.textContent = "☀️ Light Mode";
+            if(modeBtn) modeBtn.textContent = "☀️ Light Mode";
         } else {
-            modeBtn.textContent = "🌙 Dark Mode";
+            if(modeBtn) modeBtn.textContent = "🌙 Dark Mode";
         }
     });
-
-    function toggleSidebar() {
-        sidebar.classList.toggle("sidebar-hidden");
-        sidebar.classList.toggle("animate__slideInLeft");
-        overlay.classList.toggle("show");
-    }
-
     function toggleMode() {
         document.body.classList.toggle("dark-mode");
         const isDark = document.body.classList.contains("dark-mode");
         localStorage.setItem("darkMode", isDark);
-        modeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+        if(modeBtn) modeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
     }
 </script>
