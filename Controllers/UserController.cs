@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RollCall.Helpers;
 using RollCall.Models;
 using RollCall.Models.ViewModels;
 
@@ -692,7 +693,6 @@ namespace RollCall.Controllers
             return File(pdfBytes, "application/pdf", $"Attendance_{session.Course.Name}_{session.StartTime:yyyyMMdd}.pdf");
         }
 
-        //Course Sessions
 
         // UserController.cs
         [HttpGet]
