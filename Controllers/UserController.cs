@@ -418,18 +418,17 @@ namespace RollCall.Controllers
         }
 
         // ---------------- VIEW MY ENROLLMENTS (STUDENT) ----------------
+        [HttpGet]
         public async Task<IActionResult> MyEnrollments()
         {
             var userEmail = HttpContext.Session.GetString("UserEmail");
             var userRole = HttpContext.Session.GetString("UserRole");
-
             if (userRole != "Student")
             {
                 TempData["ToastMessage"] = "Access denied. Student access required.";
                 TempData["ToastType"] = "error";
                 return RedirectToAction("Index", "Home");
             }
-
             var student = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (student == null)
             {
@@ -437,17 +436,25 @@ namespace RollCall.Controllers
                 TempData["ToastType"] = "error";
                 return RedirectToAction("SignIn");
             }
-
-            // Get enrollments with course and teacher details
+            // Get enrollments with course, teacher, and grade details
             var enrollments = await _context.Enrollments
                 .Where(e => e.StudentId == student.Id)
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Teacher)
                 .OrderByDescending(e => e.EnrolledAt)
+                .Select(e => new StudentEnrollmentVM
+                {
+                    EnrollmentId = e.Id,
+                    CourseId = e.Course.Id,
+                    CourseName = e.Course.Name,
+                    TeacherName = e.Course.Teacher.Name,
+                    EnrolledAt = e.EnrolledAt,
+                    Grade = e.Grade
+                })
                 .ToListAsync();
-
             return View(enrollments);
         }
+
 
         // ---------------- VIEW COURSE ENROLLMENTS ----------------
         public async Task<IActionResult> CourseEnrollments(int courseId)
@@ -496,7 +503,8 @@ namespace RollCall.Controllers
                     StudentIdNumber = e.Student.StudentId ?? "N/A",
                     Section = e.Student.Section ?? "N/A",
                     Department = e.Student.Department ?? "N/A",
-                    EnrolledAt = e.EnrolledAt
+                    EnrolledAt = e.EnrolledAt,
+                    Grade = e.Grade
                 })
                 .ToListAsync();
 
@@ -769,6 +777,53 @@ namespace RollCall.Controllers
 
             return View(viewModel);
         }
+
+        //Assign Grade
+        [HttpPost]
+        public async Task<IActionResult> AssignGrade(int courseId, int studentId, float grade)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "Teacher not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            var course = await _context.Courses.FirstOrDefaultAsync(c => c.Id == courseId && c.TeacherId == teacher.Id);
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            var enrollment = await _context.Enrollments.FirstOrDefaultAsync(e => e.CourseId == courseId && e.StudentId == studentId);
+            if (enrollment == null)
+            {
+                TempData["ToastMessage"] = "Enrollment not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("CourseEnrollments", new { courseId });
+            }
+
+            enrollment.Grade = grade;
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Grade assigned successfully!";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("CourseEnrollments", new { courseId });
+        }
+
+
 
 
 

@@ -18,5 +18,6 @@
         public string Section { get; set; } = string.Empty;
         public string Department { get; set; } = string.Empty;
         public DateTime EnrolledAt { get; set; }
+        public float? Grade { get; set; }
     }
 }
