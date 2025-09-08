@@ -2,16 +2,19 @@
 using Microsoft.EntityFrameworkCore;
 using RollCall.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace RollCall.Controllers
 {
     public class UserController : Controller
     {
         private readonly RollCallDbContext _context;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(RollCallDbContext context)
+        public UserController(RollCallDbContext context, ILogger<UserController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // ---------------- HOME ----------------
@@ -167,6 +170,155 @@ namespace RollCall.Controllers
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
+        }
+
+        // ---------------- CREATE COURSE (GET) ----------------
+        [HttpGet]
+        public IActionResult CreateCourse()
+        {
+            // Ensure only teachers can access this
+            var userRole = HttpContext.Session.GetString("UserRole");
+            if (userRole != "Teacher")
+            {
+                TempData["Message"] = "Access denied.";
+                TempData["MessageType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+            return View(new Course()); // Pass a new Course object to the view
+        }
+
+        // ---------------- CREATE COURSE (POST) ----------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCourse(Course model)
+        {
+            _logger.LogInformation("### POST CreateCourse Started ###");
+
+            // 1. Get session values
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            _logger.LogInformation($"Session Email: {userEmail}");
+            _logger.LogInformation($"Session Role: {userRole}");
+
+            // Check if user is not logged in or is not a teacher
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userRole))
+            {
+                _logger.LogInformation("FAIL: Session was null. Redirecting to SignIn.");
+                TempData["Message"] = "Not logged in. Please sign in again.";
+                TempData["MessageType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            if (userRole != "Teacher") // This is the key check - we trust the session role
+            {
+                _logger.LogInformation("FAIL: User role in session was not 'Teacher'. Redirecting to Home.");
+                TempData["Message"] = "Access denied. Teacher access required.";
+                TempData["MessageType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.Remove("Code");
+            ModelState.Remove("Teacher");
+
+            if (ModelState.IsValid)
+            {
+                _logger.LogInformation("ModelState is Valid. Proceeding...");
+
+                // 2. Find the teacher. ONLY filter by email now!
+                // We already confirmed their role from the session.
+                var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+                _logger.LogInformation($"Teacher found: {teacher != null}");
+
+                // 3. Check if teacher was found
+                if (teacher == null)
+                {
+                    _logger.LogInformation("FAIL: Teacher not found in DB. Redirecting to SignIn.");
+                    TempData["Message"] = "User not found.";
+                    TempData["MessageType"] = "error";
+                    return RedirectToAction("SignIn");
+                }
+
+                // Generate a unique code
+                var random = new Random();
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                var uniqueCode = new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
+                _logger.LogInformation($"Generated Code: {uniqueCode}");
+
+                // Check if code is unique
+                while (await _context.Courses.AnyAsync(c => c.Code == uniqueCode))
+                {
+                    uniqueCode = new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
+                    _logger.LogInformation($"Code existed. New Code: {uniqueCode}");
+                }
+
+                // Create the new course
+                var course = new Course
+                {
+                    Name = model.Name,
+                    Code = uniqueCode,
+                    TeacherId = teacher.Id
+                };
+                _logger.LogInformation($"Course object created for: {course.Name}");
+
+                try
+                {
+                    _context.Courses.Add(course);
+                    await _context.SaveChangesAsync();
+                    _logger.LogInformation("SUCCESS: Course saved to database!");
+
+                    TempData["ToastMessage"] = $"Course created successfully! Enrollment code: <strong>{uniqueCode}</strong>";
+                    TempData["ToastType"] = "success";
+                    return RedirectToAction("TeacherPage");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "DATABASE ERROR during course save");
+                    TempData["ToastMessage"] = "An error occurred saving the course. Please try again.";
+                    TempData["ToastType"] = "error";
+                    return View(model);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("FAIL: ModelState was Invalid.");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogInformation($"Validation Error: {error.ErrorMessage}");
+                }
+                return View(model);
+            }
+        }
+
+        // ---------------- VIEW MY COURSES ----------------
+        public async Task<IActionResult> MyCourses()
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["Message"] = "Access denied. Please log in as a teacher.";
+                TempData["MessageType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Get the teacher
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["Message"] = "User not found.";
+                TempData["MessageType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Get all courses created by this teacher, ordered by most recent
+            var courses = await _context.Courses
+                .Where(c => c.TeacherId == teacher.Id)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+
+            return View(courses);
         }
 
     }
