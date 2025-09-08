@@ -7,7 +7,9 @@ namespace RollCall.Models
         public RollCallDbContext(DbContextOptions<RollCallDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Course> Courses { get; set; } // <-- Add this line
+        public DbSet<Course> Courses { get; set; }
+
+        public DbSet<Enrollment> Enrollments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -20,6 +22,11 @@ namespace RollCall.Models
             modelBuilder.Entity<Course>()
                         .HasIndex(c => c.Code)
                         .IsUnique();
+
+            //Prevent duplicate enrollments
+            modelBuilder.Entity<Enrollment>()
+                    .HasIndex(e => new { e.StudentId, e.CourseId })
+                    .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }
