@@ -1,0 +1,149 @@
+﻿@model RollCall.Models.ViewModels.CourseEnrollmentsVM
+@{
+    ViewData["Title"] = "Course Enrollments";
+}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>@Model.CourseName - Enrolled Students</h2>
+            <p class="text-light mb-0">Course Code: <span class="badge-enrollment">@Model.CourseCode</span></p>
+        </div>
+        <div>
+            <a asp-controller="User" asp-action="MyCourses" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left"></i> Back to My Courses
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model.EnrolledStudents.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Section</th>
+                                <th>Department</th>
+                                <th>Enrolled On</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var student in Model.EnrolledStudents)
+                            {
+                                <tr>
+                                    <td><strong>@student.StudentIdNumber</strong></td>
+                                    <td>@student.Name</td>
+                                    <td>@student.Email</td>
+                                    <td>@student.PhoneNumber</td>
+                                    <td>@student.Section</td>
+                                    <td>@student.Department</td>
+                                    <td>@student.EnrolledAt.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        @if (student.Grade.HasValue)
+                                        {
+                                            <span>@student.Grade.Value</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not assigned</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (student.Grade.HasValue && student.Grade.Value < 2.0)
+                                        {
+                                            <span class="badge bg-danger">FAIL</span>
+                                        }
+                                        else if (student.Grade.HasValue)
+                                        {
+                                            <span class="badge bg-success">PASS</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#gradeModal-@student.StudentId">
+                                            <i class="fas fa-edit"></i> Assign Grade
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-users-slash fa-3x mb-3 text-muted"></i>
+                    <h4>No students enrolled yet</h4>
+                    <p class="text-muted">Students can enroll using the course code: <strong>@Model.CourseCode</strong></p>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" onclick="copyToClipboard('@Model.CourseCode')">
+                            <i class="fas fa-copy"></i> Copy Enrollment Code
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@foreach (var student in Model.EnrolledStudents)
+{
+    <div class="modal fade" id="gradeModal-@student.StudentId" tabindex="-1" aria-labelledby="gradeModalLabel-@student.StudentId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-controller="User" asp-action="AssignGrade" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="gradeModalLabel-@student.StudentId">Assign Grade for @student.Name</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="courseId" value="@Model.CourseId" />
+                        <input type="hidden" name="studentId" value="@student.StudentId" />
+                        <div class="mb-3">
+                            <label for="grade-@student.StudentId" class="form-label">Grade</label>
+                            <input type="number" step="any" min="0" max="4" class="form-control" id="grade-@student.StudentId" name="grade" value="@(student.Grade?.ToString() ?? "")" required />
+                            <div class="form-text">Enter a grade between 0.0 and 4.0</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Grade</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = event.target.innerHTML;
+                event.target.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                event.target.classList.remove('btn-primary');
+                event.target.classList.add('btn-success');
+                setTimeout(() => {
+                    event.target.innerHTML = originalText;
+                    event.target.classList.remove('btn-success');
+                    event.target.classList.add('btn-primary');
+                }, 2000);
+            }).catch(function(err) {
+                alert('Failed to copy: ' + err);
+            });
+        }
+    </script>
+}

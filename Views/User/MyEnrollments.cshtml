@@ -1,0 +1,101 @@
+﻿@model List<RollCall.Models.ViewModels.StudentEnrollmentVM>
+
+@{
+    ViewData["Title"] = "My Enrollments";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 30px;
+        margin: 20px auto;
+        backdrop-filter: blur(10px);
+        max-width: 1000px;
+    }
+
+    .enrollment-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #ecf0f1;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Course Enrollments</h2>
+        <div>
+            <a asp-action="EnrollInCourse" class="btn btn-primary me-2">
+                <i class="fas fa-plus"></i> Enroll in New Course
+            </a>
+            <a asp-action="StudentPage" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (Model.Any())
+    {
+        @foreach (var enrollment in Model)
+        {
+            <div class="enrollment-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h4 class="mb-1">@enrollment.CourseName</h4>
+                        <p class="text-muted mb-1">Taught by: @enrollment.TeacherName</p>
+                        <small class="text-muted">Enrolled: @enrollment.EnrolledAt.ToString("MMM dd, yyyy")</small>
+                    </div>
+                    <div class="text-end">
+                        @if (enrollment.Grade.HasValue)
+                        {
+                            <div class="mb-2">
+                                <span class="badge @(enrollment.Grade.Value < 2.0 ? "bg-danger" : "bg-success")">
+                                    @(enrollment.Grade.Value < 2.0 ? "FAIL" : "PASS")
+                                </span>
+                                <span class="ms-2">Grade: @enrollment.Grade.Value</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">No Grade</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-book-open fa-3x mb-3"></i>
+            <h4>No course enrollments yet</h4>
+            <p>Use an enrollment code from your instructor to join a course.</p>
+            <a asp-action="EnrollInCourse" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Enroll in Your First Course
+            </a>
+        </div>
+    }
+</div>

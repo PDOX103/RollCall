@@ -3,18 +3,99 @@
     ViewData["Title"] = "Student Dashboard";
 }
 
-<div class="container mt-5">
-    <h2>Welcome, @Model.Name!</h2>
-    <p>You are logged in as <strong>Student</strong>.</p>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <div class="card mt-4">
-        <div class="card-body">
-            <h5 class="card-title">Your Details</h5>
-            <p><strong>Student ID:</strong> @Model.StudentId</p>
-            <p><strong>Section:</strong> @Model.Section</p>
-            <p><strong>Department:</strong> @Model.Department</p>
-            <p><strong>Email:</strong> @Model.Email</p>
-            <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .content {
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        margin: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+        color: #2c3e50;
+        font-weight: bold;
+    }
+</style>
+
+<div>
+    <div class="content">
+        <h2>Welcome, @Model.Name!</h2>
+        <p>You are logged in as <strong>Student</strong>.</p>
+
+        <!-- Student Details Card -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Your Details</h5>
+                <p><strong>Student ID:</strong> @Model.StudentId</p>
+                <p><strong>Section:</strong> @Model.Section</p>
+                <p><strong>Department:</strong> @Model.Department</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+                <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+            </div>
         </div>
+
+        <!-- Enrollment Management Cards -->
+        <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-plus-circle fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Enroll in Course</h5>
+                        <p class="card-text">Use an enrollment code from your instructor to join a course.</p>
+                        <a asp-controller="User" asp-action="EnrollInCourse" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Enroll Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x mb-3 text-success"></i>
+                        <h5 class="card-title">My Enrollments</h5>
+                        <p class="card-text">View all the courses you're enrolled in.</p>
+                        <a asp-controller="User" asp-action="MyEnrollments" class="btn btn-success">
+                            <i class="fas fa-eye"></i> View Enrollments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Enrollment Cards -->
+
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x mb-3 text-warning"></i>
+                    <h5 class="card-title">Active Sessions</h5>
+                    <p class="card-text">View and mark attendance for active sessions.</p>
+                    <a asp-controller="User" asp-action="ActiveSessions" class="btn btn-warning">
+                        <i class="fas fa-eye"></i> View Active Sessions
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>

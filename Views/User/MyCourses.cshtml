@@ -1,0 +1,153 @@
+﻿@model List<RollCall.Models.Course>
+
+@{
+    ViewData["Title"] = "My Courses";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 30px;
+        margin: 20px auto;
+        backdrop-filter: blur(10px);
+        max-width: 1000px;
+    }
+
+    .course-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .course-code {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .btn-copy {
+        background: #3a7bd5;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8em;
+    }
+
+        .btn-copy:hover {
+            opacity: 0.9;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #ecf0f1;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Created Courses</h2>
+        <a asp-action="CreateCourse" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Course
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        @foreach (var course in Model)
+        {
+            <div class="course-card">
+                <div class="course-header">
+                    <h4 class="mb-0">@course.Name</h4>
+                    <span class="course-code" id="code-@course.Id">@course.Code</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Created: @course.CreatedAt.ToString("MMM dd, yyyy hh:mm tt")</small>
+                    </div>
+                    <div>
+                        <button class="btn-copy" onclick="copyCode('@course.Code', '@course.Id')">
+                            <i class="fas fa-copy"></i> Copy Code
+                        </button>
+                        <!-- ADD THIS BUTTON -->
+                        <a asp-controller="User" asp-action="CourseEnrollments" asp-route-courseId="@course.Id"
+                           class="btn btn-info btn-sm ms-2">
+                            <i class="fas fa-users"></i> View Enrollments
+                        </a>
+
+                        <a asp-controller="User" asp-action="StartSession" asp-route-courseId="@course.Id" class="btn btn-success btn-sm ms-2">
+                            <i class="fas fa-clock"></i> Start Session
+                        </a>
+
+                        <a asp-controller="User" asp-action="CourseSessions" asp-route-courseId="@course.Id" class="btn btn-info btn-sm ms-2">
+                            <i class="fas fa-list"></i> View Sessions
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-book-open fa-3x mb-3"></i>
+            <h4>No courses created yet</h4>
+            <p>Create your first course to generate an enrollment code for students.</p>
+            <a asp-action="CreateCourse" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Create Your First Course
+            </a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function copyCode(code, courseId) {
+            navigator.clipboard.writeText(code).then(function() {
+                // Show feedback
+                const button = document.querySelector(`button[onclick="copyCode('${code}', '${courseId}')"]`);
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = '#28a745';
+
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#3a7bd5';
+                }, 2000);
+            }).catch(function(err) {
+                alert('Failed to copy code: ' + err);
+            });
+        }
+    </script>
+}
