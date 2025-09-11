@@ -567,7 +567,7 @@ namespace RollCall.Controllers
 
             TempData["ToastMessage"] = "Session started successfully!";
             TempData["ToastType"] = "success";
-            return RedirectToAction("SessionDetails", new { sessionId = session.Id });
+            return RedirectToAction("CourseSessions", new { courseId = session.CourseId });
         }
 
 
