@@ -493,7 +493,7 @@ namespace RollCall.Controllers
             var enrolledStudents = await _context.Enrollments
                 .Where(e => e.CourseId == courseId)
                 .Include(e => e.Student)
-                .OrderBy(e => e.Student.Name)
+                .OrderBy(e => e.Student.StudentId)
                 .Select(e => new EnrolledStudent
                 {
                     StudentId = e.Student.Id,
