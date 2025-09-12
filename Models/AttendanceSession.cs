@@ -21,5 +21,8 @@ namespace RollCall.Models
 
         [Required]
         public bool IsActive { get; set; } = true;
+
+        public DateTime? PlannedEndTime { get; set; }
+
     }
 }
