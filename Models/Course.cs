@@ -22,5 +22,11 @@ namespace RollCall.Models
         public User Teacher { get; set; } = default!; // Add = default!
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Required]
+        public bool IsActive { get; set; } = true;
+
+        public DateTime? EndedAt { get; set; }
+
     }
 }
