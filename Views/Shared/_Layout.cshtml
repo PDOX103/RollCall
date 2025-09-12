@@ -83,8 +83,8 @@
 
         .profile-avatar {
             border-radius: 50%;
-            border: 3px solid #fff; /* White border */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25); /* Soft shadow */
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             object-fit: cover;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -93,8 +93,6 @@
                 transform: scale(1.1);
                 box-shadow: 0 6px 16px rgba(0,0,0,0.35);
             }
-
-
 
         .profile-dropdown-toggle img {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -114,7 +112,6 @@
                 border-radius: 6px;
             }
 
-        /* Flexbox to keep icon and logout button in correct order */
         .auth-buttons {
             display: flex;
             align-items: center;
@@ -136,8 +133,6 @@
                 box-shadow: none !important;
                 background: transparent !important;
             }
-
-
     </style>
 </head>
 <body>
@@ -166,7 +161,6 @@
                         </li>
                     </ul>
 
-                    <!-- Right aligned auth buttons -->
                     <div class="auth-buttons mt-2 mt-sm-0">
                         @if (Context.Session.GetString("UserEmail") == null)
                         {
@@ -189,11 +183,36 @@
                                         <i class="bi bi-person-circle me-2"></i> Signed in
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
+
+                                    <!-- Role Based Dashboard -->
+                                    @{
+                                        var role = Context.Session.GetString("UserRole");
+                                        string action = "Index";
+                                        string icon = "bi-speedometer2 text-primary";
+
+                                        if (role == "Student")
+                                        {
+                                            action = "StudentPage";
+                                            icon = "bi-journal-bookmark text-info";
+                                        }
+                                        else if (role == "Teacher")
+                                        {
+                                            action = "TeacherPage";
+                                            icon = "bi-easel2 text-success";
+                                        }
+                                        else if (role == "Admin")
+                                        {
+                                            action = "AdminPage";
+                                            icon = "bi-shield-lock text-danger";
+                                        }
+                                    }
+
                                     <li>
-                                        <a class="dropdown-item d-flex align-items-center" asp-controller="User" asp-action="TeacherPage">
-                                            <i class="bi bi-speedometer2 me-2 text-primary"></i> Dashboard
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="User" asp-action="@action">
+                                            <i class="bi @icon me-2"></i> Dashboard
                                         </a>
                                     </li>
+
                                     <li>
                                         <a class="dropdown-item d-flex align-items-center" asp-controller="User" asp-action="Profile">
                                             <i class="bi bi-person me-2 text-success"></i> Profile
@@ -202,8 +221,7 @@
                                 </ul>
                             </div>
 
-
-                            <!-- Logout button (unchanged, positioned to the right) -->
+                            <!-- Logout -->
                             <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
                                 <button type="submit" class="btn-modern">Logout</button>
                             </form>
@@ -220,10 +238,9 @@
         </main>
     </div>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div id="toastContainer"></div>
 
-    <!-- Custom Footer -->
     <footer class="text-center">
         <div class="container">
             <p class="mb-1">&copy; 2025 - RollCall</p>
@@ -234,35 +251,21 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- Page Loader Script -->
+    <!-- Page Loader -->
     <script>
         window.addEventListener("load", () => {
             setTimeout(() => {
                 document.getElementById("page-loader").classList.add("hidden");
             }, 500);
         });
-
-        document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", e => {
-                if (link.getAttribute("href")?.startsWith("#") || link.target === "_blank") return;
-                document.getElementById("page-loader").classList.remove("hidden");
-            });
-        });
-
-        document.querySelectorAll("form").forEach(form => {
-            form.addEventListener("submit", () => {
-                document.getElementById("page-loader").classList.remove("hidden");
-            });
-        });
     </script>
 
-    <!-- Toast Notification Script -->
+    <!-- Toast Script -->
     <script>
         function showToast(message, type = 'success') {
             const toastId = 'toast-' + Date.now();
@@ -279,18 +282,18 @@
             }, 5000);
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             @if (TempData["ToastMessage"] != null)
             {
-                        <text>
+                    <text>
                         showToast('@Html.Raw(TempData["ToastMessage"])', '@(TempData["ToastType"] ?? "success")');
-                        </text>
+                    </text>
             }
             @if (TempData["Message"] != null)
             {
-                        <text>
+                    <text>
                         showToast('@Html.Raw(TempData["Message"])', '@(TempData["MessageType"] ?? "success")');
-                        </text>
+                    </text>
             }
         });
     </script>
