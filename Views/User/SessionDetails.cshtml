@@ -2,7 +2,10 @@
 @{
     ViewData["Title"] = "Session Details";
 }
-<div class="container">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Session Details for @Model.Session.Course.Name</h2>
         <a asp-controller="User" asp-action="CourseSessions" asp-route-courseId="@Model.Session.CourseId" class="btn btn-outline-secondary">
@@ -10,27 +13,55 @@
         </a>
     </div>
 
+    @Html.AntiForgeryToken() <!-- needed for AJAX EndSession -->
+
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
                     <p>
-                        <strong>Status:</strong> <span class="badge @(Model.Session.IsActive ? "bg-success" : "bg-secondary")">
+                        <strong>Status:</strong>
+                        <span id="session-status" class="badge @(Model.Session.IsActive ? "bg-success" : "bg-secondary")">
                             @(Model.Session.IsActive ? "Active" : "Ended")
                         </span>
                     </p>
-                    <p><strong>Start Time:</strong> @Model.Session.StartTime.ToString("g")</p>
-                    @if (Model.Session.EndTime.HasValue)
-                    {
-                        <p><strong>End Time:</strong> @Model.Session.EndTime.Value.ToString("g")</p>
-                    }
+
+                    <p><strong>Start Time:</strong> @Model.Session.StartTime.ToLocalTime().ToString("g")</p>
+
+                    <div id="planned-end-block">
+                        @if (Model.Session.PlannedEndTime.HasValue)
+                        {
+                            <p><strong>Planned End Time:</strong> <span id="planned-end">@Model.Session.PlannedEndTime.Value.ToLocalTime().ToString("g")</span></p>
+                        }
+                        else
+                        {
+                            <p id="no-planned-end"><strong>Planned End Time:</strong> <em>Not set</em></p>
+                        }
+                    </div>
+
+                    <div id="countdown-container" class="mb-2">
+                        @if (Model.Session.PlannedEndTime.HasValue && Model.Session.IsActive)
+                        {
+                            <div id="countdown" class="alert alert-info">Loading countdown…</div>
+                        }
+                        else if (!Model.Session.IsActive)
+                        {
+                            <div id="countdown" class="alert alert-secondary">Session ended</div>
+                        }
+                        else
+                        {
+                            <div id="countdown" class="alert alert-muted">No end time set</div>
+                        }
+                    </div>
                 </div>
+
                 <div class="col-md-6 text-end">
                     @if (Model.Session.IsActive)
                     {
-                        <form asp-action="EndSession" method="post" class="d-inline">
+                        <form id="endSessionForm" asp-action="EndSession" method="post" class="d-inline">
+                            @* classic (non-AJAX) fallback button *@
                             <input type="hidden" name="sessionId" value="@Model.Session.Id" />
-                            <button type="submit" class="btn btn-danger">
+                            <button type="submit" class="btn btn-danger mb-2">
                                 <i class="fas fa-stop"></i> End Session
                             </button>
                         </form>
@@ -39,6 +70,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Update end time -->
+    @if (Model.Session.IsActive)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Edit Planned End Time</h5>
+                <form asp-action="UpdateEndTime" method="post" id="updateEndTimeForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="sessionId" value="@Model.Session.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">New End Time</label>
+                        <input name="newEndTime" type="datetime-local" class="form-control" required />
+                        <div class="form-text">Pick a future end time (local).</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update End Time</button>
+                </form>
+            </div>
+        </div>
+    }
 
     <div class="card">
         <div class="card-body">
@@ -67,7 +118,7 @@
                                     <td>@record.Student.Name</td>
                                     <td>@record.Student.Section</td>
                                     <td>@record.Student.Email</td>
-                                    <td>@record.MarkedAt.ToString("g")</td>
+                                    <td>@record.MarkedAt.ToLocalTime().ToString("g")</td>
                                 </tr>
                             }
                         </tbody>
@@ -90,3 +141,125 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        // Get initial values from server-rendered model
+        const sessionId = "@Model.Session.Id";
+        const initialPlannedIso = "@(Model.Session.PlannedEndTime?.ToString("o") ?? "")";
+        let plannedDate = initialPlannedIso ? new Date(initialPlannedIso) : null;
+        let isActive = @(Model.Session.IsActive.ToString().ToLower()); // renders true/false unquoted
+        const csrfTokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        const csrfToken = csrfTokenInput ? csrfTokenInput.value : null;
+
+        const countdownEl = document.getElementById('countdown');
+        const statusEl = document.getElementById('session-status');
+        const plannedEndDisplay = document.getElementById('planned-end');
+        const noPlannedBlock = document.getElementById('no-planned-end');
+
+        let countdownTimer = null;
+        let pollTimer = null;
+
+        function stopAll() {
+            if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+            if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        }
+
+        async function fetchStatus() {
+            try {
+                const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
+                if (!resp.ok) return;
+                const j = await resp.json();
+                // update local state
+                isActive = !!j.isActive;
+                if (j.plannedEndTime) {
+                    plannedDate = new Date(j.plannedEndTime);
+                    if (plannedEndDisplay) plannedEndDisplay.textContent = plannedDate.toLocaleString();
+                    if (noPlannedBlock) noPlannedBlock.style.display = 'none';
+                }
+
+                // if server says session ended, stop
+                if (!isActive) {
+                    if (statusEl) {
+                        statusEl.className = 'badge bg-secondary';
+                        statusEl.textContent = 'Ended';
+                    }
+                    if (countdownEl) countdownEl.innerHTML = 'Session ended';
+                    stopAll();
+                }
+            } catch (e) {
+                console.warn('status fetch error', e);
+            }
+        }
+
+        async function endSessionAjax() {
+            if (!csrfToken) return;
+            try {
+                const fd = new FormData();
+                fd.append('sessionId', sessionId);
+                const resp = await fetch('/User/EndSessionAjax', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': csrfToken },
+                    body: fd
+                });
+                if (!resp.ok) return;
+                const json = await resp.json();
+                if (json.success) {
+                    isActive = false;
+                    if (statusEl) {
+                        statusEl.className = 'badge bg-secondary';
+                        statusEl.textContent = 'Ended';
+                    }
+                    if (countdownEl) countdownEl.innerHTML = 'Session ended';
+                    stopAll();
+                }
+            } catch (err) {
+                console.error('endSessionAjax error', err);
+            }
+        }
+
+        function updateCountdown() {
+            if (!isActive) {
+                countdownEl.innerHTML = 'Session ended';
+                stopAll();
+                return;
+            }
+            if (!plannedDate) {
+                countdownEl.innerHTML = 'No end time set';
+                return;
+            }
+            const now = new Date();
+            const diff = plannedDate - now;
+            if (diff <= 0) {
+                countdownEl.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
+                // mark session ended (AJAX call)
+                stopAll();
+                endSessionAjax();
+                return;
+            }
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff / (1000 * 60)) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            countdownEl.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+        }
+
+        // Start timers only if there's a planned end or session active
+        if (isActive && plannedDate) {
+            updateCountdown();
+            countdownTimer = setInterval(updateCountdown, 1000);
+            pollTimer = setInterval(fetchStatus, 4000); // poll every 4s to detect manual end
+        } else {
+            // still poll once in a while to detect new planned end or manual ended elsewhere
+            pollTimer = setInterval(fetchStatus, 8000);
+        }
+
+        // Also listen for manual "End Session" form submit to stop timers on page reload.
+        const endForm = document.getElementById('endSessionForm');
+        if (endForm) {
+            endForm.addEventListener('submit', () => {
+                // Immediately stop JS timers to avoid race/hang while page navigates
+                stopAll();
+            });
+        }
+    })();
+</script>

@@ -2,7 +2,10 @@
 @{
     ViewData["Title"] = "Course Sessions";
 }
-<div class="container">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Sessions for @Model.Course.Name</h2>
         <a asp-controller="User" asp-action="MyCourses" class="btn btn-outline-secondary">
@@ -10,40 +13,171 @@
         </a>
     </div>
 
+    @Html.AntiForgeryToken()  <!-- required for AJAX POSTs -->
     @if (Model.Sessions.Any())
     {
-        @foreach (var session in Model.Sessions)
-        {
-            <div class="card mb-3">
-                <div class="card-body">
+        <div class="list-group">
+            @foreach (var session in Model.Sessions)
+            {
+                var plannedIso = session.PlannedEndTime.HasValue ? session.PlannedEndTime.Value.ToString("o") : "";
+                <div class="list-group-item mb-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="card-title">
-                                Session @session.Id @Html.Raw(session.IsActive ? "<span class='badge bg-success'>Active</span>" : "<span class='badge bg-secondary'>Ended</span>")
-                            </h5>
-
-                            <p class="card-text">
-                                Started: @session.StartTime.ToString("g")<br />
-                                @if (session.EndTime.HasValue)
+                            <h5 class="mb-1">
+                                Session @session.Id
+                                @if (session.IsActive)
                                 {
-                                    <text>Ended: @session.EndTime.Value.ToString("g")</text>
+                                    <span class="badge bg-success ms-2">Active</span>
                                 }
-                            </p>
+                                else
+                                {
+                                    <span class="badge bg-secondary ms-2">Ended</span>
+                                }
+                            </h5>
+                            <p class="mb-1">Started: @session.StartTime.ToLocalTime().ToString("g")</p>
+                            @if (session.PlannedEndTime.HasValue)
+                            {
+                                <p class="mb-1">Planned End: @session.PlannedEndTime.Value.ToLocalTime().ToString("g")</p>
+                            }
                         </div>
-                        <a asp-controller="User" asp-action="SessionDetails" asp-route-sessionId="@session.Id" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
+
+                        <div class="text-end">
+                            <div id="countdown-@session.Id" data-session-id="@session.Id" data-planned="@plannedIso" data-active="@(session.IsActive.ToString().ToLower())" style="min-width:160px;">
+                                @if (session.IsActive && session.PlannedEndTime.HasValue)
+                                {
+                                    <small class="text-muted">Loading countdown…</small>
+                                }
+                                else if (!session.IsActive)
+                                {
+                                    <small class="text-muted">Session ended</small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">No end time set</small>
+                                }
+                            </div>
+
+                            <a asp-controller="User" asp-action="SessionDetails" asp-route-sessionId="@session.Id" class="btn btn-primary btn-sm mt-2">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
     else
     {
-        <div class="empty-state">
-            <i class="fas fa-clock fa-3x mb-3"></i>
+        <div class="empty-state text-center py-5">
+            <i class="fas fa-clock fa-3x mb-3 text-muted"></i>
             <h5>No sessions yet</h5>
             <p>Start a new session to track attendance.</p>
         </div>
     }
 </div>
+
+<script>
+    (function () {
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        const csrfToken = tokenInput ? tokenInput.value : null;
+
+        function initCountdown(element) {
+            const sessionId = element.dataset.sessionId;
+            const plannedIso = element.dataset.planned;
+            let isActive = element.dataset.active === "true";
+            let plannedDate = plannedIso ? new Date(plannedIso) : null;
+
+            let countdownTimer = null;
+            let pollTimer = null;
+
+            function stopAll() {
+                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+            }
+
+            async function fetchStatus() {
+                try {
+                    const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
+                    if (!resp.ok) return;
+                    const json = await resp.json();
+                    // server returns ISO strings
+                    isActive = !!json.isActive;
+                    element.dataset.active = isActive ? "true" : "false";
+
+                    if (json.plannedEndTime) {
+                        plannedDate = new Date(json.plannedEndTime);
+                    }
+
+                    if (!isActive) {
+                        element.innerHTML = '<span class="text-muted">Session ended</span>';
+                        stopAll();
+                    }
+                } catch (err) {
+                    console.warn('status fetch failed', err);
+                }
+            }
+
+            async function autoEndSessionOnExpiry() {
+                // call EndSessionAjax to mark ended on server
+                if (!csrfToken) return;
+                try {
+                    const formData = new FormData();
+                    formData.append('sessionId', sessionId);
+
+                    const resp = await fetch('/User/EndSessionAjax', {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': csrfToken },
+                        body: formData
+                    });
+                    if (!resp.ok) return;
+                    const json = await resp.json();
+                    if (json.success) {
+                        isActive = false;
+                        element.innerHTML = '<span class="text-muted">Session ended</span>';
+                        stopAll();
+                    }
+                } catch (err) {
+                    console.error('auto-end failed', err);
+                }
+            }
+
+            function updateCountdown() {
+                if (!isActive) {
+                    element.innerHTML = '<span class="text-muted">Session ended</span>';
+                    stopAll();
+                    return;
+                }
+                if (!plannedDate) {
+                    element.innerHTML = '<small class="text-muted">No end time set</small>';
+                    return;
+                }
+
+                const now = new Date();
+                const diff = plannedDate - now;
+                if (diff <= 0) {
+                    element.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
+                    stopAll();
+                    autoEndSessionOnExpiry(); // call server to set final EndTime/IsActive
+                    return;
+                }
+
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                element.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+            }
+
+            // initial update
+            updateCountdown();
+
+            // every second update countdown
+            countdownTimer = setInterval(updateCountdown, 1000);
+
+            // poll status every 5s to detect manual End from other clients
+            pollTimer = setInterval(fetchStatus, 5000);
+        }
+
+        document.querySelectorAll('[data-session-id]').forEach(el => initCountdown(el));
+    })();
+</script>

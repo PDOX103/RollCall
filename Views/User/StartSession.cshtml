@@ -2,14 +2,28 @@
 @{
     ViewData["Title"] = "Start Attendance Session";
 }
-<div class="form-card">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<div class="form-card container" style="max-width:600px; margin-top:30px;">
     <h3 class="text-center mb-4">Start New Attendance Session</h3>
     <form asp-action="StartSession" method="post">
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="CourseId" />
-        <div class="form-group mb-3">
+
+        <div class="mb-3">
             <label asp-for="CourseId" class="form-label">Course</label>
             <input asp-for="CourseId" class="form-control" readonly />
         </div>
+
+        <div class="mb-3">
+            <label asp-for="PlannedEndTime" class="form-label">Planned End Time (optional)</label>
+            <!-- datetime-local will bind; on POST controller converts to UTC -->
+            <input asp-for="PlannedEndTime" type="datetime-local" class="form-control" />
+            <div class="form-text">Set an end time (local). If provided, session will auto-end when countdown reaches zero.</div>
+        </div>
+
         <button type="submit" class="btn btn-primary w-100">Start Session</button>
     </form>
 </div>
