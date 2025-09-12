@@ -8,8 +8,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RollCall.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -24,35 +24,36 @@
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Ensure body takes at least full viewport height */
+            min-height: 100vh;
         }
 
         .container.pb-5 {
-            flex: 1 0 auto; /* Allow container to grow and take available space */
+            flex: 1 0 auto;
         }
 
         .navbar {
-            background: #ECE9E6; /* fallback for old browsers */
-            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6); /* Chrome 10-25, Safari 5.1-6 */
-            background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: #ECE9E6;
+            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6);
+            background: linear-gradient(to right, #FFFFFF, #ECE9E6);
         }
 
         .navbar-brand, .nav-link {
-            color: black !important; /* White text for readability */
+            color: black !important;
         }
 
         .btn-light.rounded-circle {
-            background-color: #fff; /* White background for profile icon */
-            color: #3d5a80; /* Blue icon color to match navbar */
+            background-color: white;
+            color: black;
+            border-radius: 50%;
         }
 
         footer {
-            background: #ECE9E6; /* fallback for old browsers */
-            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6); /* Chrome 10-25, Safari 5.1-6 */
-            background: linear-gradient(to right, #FFFFFF, #ECE9E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background: #ECE9E6;
+            background: -webkit-linear-gradient(to right, #FFFFFF, #ECE9E6);
+            background: linear-gradient(to right, #FFFFFF, #ECE9E6);
             color: black;
             padding: 20px 0;
-            flex-shrink: 0; /* Prevent footer from shrinking */
+            flex-shrink: 0;
         }
 
             footer a {
@@ -64,7 +65,6 @@
                     text-decoration: underline;
                 }
 
-        /* Toast Animation */
         .alert[style*="position: fixed"] {
             animation: slideInRight 0.3s ease-out;
         }
@@ -81,44 +81,58 @@
             }
         }
 
-        /* Page Loader Styles */
-        #page-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.3s ease;
-        }
-
-            #page-loader.hidden {
-                opacity: 0;
-                pointer-events: none;
-            }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3a7bd5;
+        .profile-avatar {
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            object-fit: cover;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
+            .profile-avatar:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.35);
             }
 
-            100% {
-                transform: rotate(360deg);
-            }
+        .profile-dropdown-toggle img {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+            .profile-dropdown-toggle img:hover {
+                transform: scale(1.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+
+        .dropdown-menu {
+            font-size: 0.95rem;
+        }
+
+            .dropdown-menu .dropdown-item:hover {
+                background-color: #f1f1f1;
+                border-radius: 6px;
+            }
+
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-dropdown-toggle {
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+
+            .profile-dropdown-toggle:focus,
+            .profile-dropdown-toggle:active,
+            .profile-dropdown-toggle:visited {
+                outline: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
     </style>
 </head>
 <body>
@@ -147,7 +161,6 @@
                         </li>
                     </ul>
 
-                    <!-- Right aligned auth buttons -->
                     <div class="auth-buttons mt-2 mt-sm-0">
                         @if (Context.Session.GetString("UserEmail") == null)
                         {
@@ -156,10 +169,59 @@
                         }
                         else
                         {
-                            <!-- Profile Icon -->
-                            <a asp-controller="User" asp-action="Profile" class="btn btn-group rounded-circle me-2" title="My Profile">
-                                <i class="bi bi-person-circle fs-4"></i>
-                            </a>
+                            <!-- Profile Dropdown -->
+                            <div class="dropdown">
+                                <a class="btn profile-dropdown-toggle me-2" href="#" role="button"
+                                   id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="My Profile">
+                                    <img src="~/images/profile-avatar.png"
+                                         alt="Profile"
+                                         class="profile-avatar"
+                                         width="42" height="42" />
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3" aria-labelledby="profileDropdown">
+                                    <li class="px-3 py-2 text-muted small">
+                                        <i class="bi bi-person-circle me-2"></i> Signed in
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+
+                                    <!-- Role Based Dashboard -->
+                                    @{
+                                        var role = Context.Session.GetString("UserRole");
+                                        string action = "Index";
+                                        string icon = "bi-speedometer2 text-primary";
+
+                                        if (role == "Student")
+                                        {
+                                            action = "StudentPage";
+                                            icon = "bi-journal-bookmark text-info";
+                                        }
+                                        else if (role == "Teacher")
+                                        {
+                                            action = "TeacherPage";
+                                            icon = "bi-easel2 text-success";
+                                        }
+                                        else if (role == "Admin")
+                                        {
+                                            action = "AdminPage";
+                                            icon = "bi-shield-lock text-danger";
+                                        }
+                                    }
+
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="User" asp-action="@action">
+                                            <i class="bi @icon me-2"></i> Dashboard
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" asp-controller="User" asp-action="Profile">
+                                            <i class="bi bi-person me-2 text-success"></i> Profile
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Logout -->
                             <form asp-controller="User" asp-action="Logout" method="post" class="d-inline">
                                 <button type="submit" class="btn-modern">Logout</button>
                             </form>
@@ -176,10 +238,9 @@
         </main>
     </div>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div id="toastContainer"></div>
 
-    <!-- Custom Footer -->
     <footer class="text-center">
         <div class="container">
             <p class="mb-1">&copy; 2025 - RollCall</p>
@@ -190,37 +251,21 @@
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- Page Loader Script -->
+    <!-- Page Loader -->
     <script>
-        // Hide loader after at least 2 seconds on page load
         window.addEventListener("load", () => {
             setTimeout(() => {
                 document.getElementById("page-loader").classList.add("hidden");
             }, 500);
         });
-
-        // Show loader on navigation (links)
-        document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", e => {
-                if (link.getAttribute("href")?.startsWith("#") || link.target === "_blank") return;
-                document.getElementById("page-loader").classList.remove("hidden");
-            });
-        });
-
-        // Show loader on form submit
-        document.querySelectorAll("form").forEach(form => {
-            form.addEventListener("submit", () => {
-                document.getElementById("page-loader").classList.remove("hidden");
-            });
-        });
     </script>
 
-    <!-- Toast Notification Script -->
+    <!-- Toast Script -->
     <script>
         function showToast(message, type = 'success') {
             const toastId = 'toast-' + Date.now();
@@ -230,39 +275,27 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
-
             document.getElementById('toastContainer').insertAdjacentHTML('beforeend', toastHtml);
-
-            // Remove after 5 seconds
             setTimeout(() => {
                 const toast = document.getElementById(toastId);
-                if (toast) {
-                    toast.remove();
-                }
+                if (toast) toast.remove();
             }, 5000);
         }
 
-        // Check for TempData messages on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check for new ToastMessage format
+        document.addEventListener('DOMContentLoaded', function () {
             @if (TempData["ToastMessage"] != null)
             {
-                        <text>
+                    <text>
                         showToast('@Html.Raw(TempData["ToastMessage"])', '@(TempData["ToastType"] ?? "success")');
-                        </text>
+                    </text>
             }
-
-            // Check for old Message format (for backward compatibility)
             @if (TempData["Message"] != null)
             {
-                        <text>
+                    <text>
                         showToast('@Html.Raw(TempData["Message"])', '@(TempData["MessageType"] ?? "success")');
-                        </text>
+                    </text>
             }
         });
     </script>
-    <!-- Add these scripts at the end of your _Layout.cshtml, before the closing </body> tag -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

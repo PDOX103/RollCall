@@ -271,7 +271,7 @@ namespace RollCall.Controllers
 
                     TempData["ToastMessage"] = $"Course created successfully! Enrollment code: <strong>{uniqueCode}</strong>";
                     TempData["ToastType"] = "success";
-                    return RedirectToAction("TeacherPage");
+                    return RedirectToAction("MyCourses");
                 }
                 catch (Exception ex)
                 {
@@ -293,7 +293,7 @@ namespace RollCall.Controllers
         }
 
         // ---------------- VIEW MY COURSES ----------------
-        public async Task<IActionResult> MyCourses()
+        public async Task<IActionResult> MyCourses(int page = 1)
         {
             var userEmail = HttpContext.Session.GetString("UserEmail");
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -305,7 +305,6 @@ namespace RollCall.Controllers
                 return RedirectToAction("SignIn");
             }
 
-            // Get the teacher
             var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (teacher == null)
             {
@@ -314,14 +313,94 @@ namespace RollCall.Controllers
                 return RedirectToAction("SignIn");
             }
 
-            // Get all courses created by this teacher, ordered by most recent
-            var courses = await _context.Courses
-                .Where(c => c.TeacherId == teacher.Id)
-                .OrderByDescending(c => c.CreatedAt)
+            int pageSize = 5; // show 5 courses per page
+
+            var coursesQuery = _context.Courses
+                .Where(c => c.TeacherId == teacher.Id && c.IsActive)
+                .OrderByDescending(c => c.CreatedAt); // latest courses first
+
+            var totalCourses = await coursesQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCourses / (double)pageSize);
+
+            var courses = await coursesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(courses);
         }
+
+
+        // ---------------- END COURSE ----------------
+        [HttpPost]
+        public async Task<IActionResult> EndCourse(int id)
+        {
+            var course = await _context.Courses.FindAsync(id);
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            course.IsActive = false;
+            course.EndedAt = DateTime.UtcNow; // Record when the course ended
+
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Course has been ended successfully.";
+            TempData["ToastType"] = "success";
+            return RedirectToAction("MyCourses");
+        }
+
+
+        // ---------------- VIEW ENDED COURSES ----------------
+        [HttpGet]
+        public async Task<IActionResult> EndCourses(int page = 1)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Get the teacher
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "User not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            int pageSize = 5; // show 5 courses per page
+
+            // Get ended courses query
+            var endedCoursesQuery = _context.Courses
+                .Where(c => c.TeacherId == teacher.Id && !c.IsActive)
+                .OrderBy(c => c.EndedAt); // earliest ended courses first
+
+            var totalCourses = await endedCoursesQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCourses / (double)pageSize);
+
+            var endedCourses = await endedCoursesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(endedCourses);
+        }
+
 
 
         // ---------------- ENROLL IN COURSE (GET) ----------------
@@ -406,7 +485,7 @@ namespace RollCall.Controllers
 
                 TempData["ToastMessage"] = $"Successfully enrolled in <strong>{course.Name}</strong> taught by {course.Teacher.Name}!";
                 TempData["ToastType"] = "success";
-                return RedirectToAction("StudentPage");
+                return RedirectToAction("MyEnrollments");
             }
             catch (Exception ex)
             {
@@ -493,7 +572,7 @@ namespace RollCall.Controllers
             var enrolledStudents = await _context.Enrollments
                 .Where(e => e.CourseId == courseId)
                 .Include(e => e.Student)
-                .OrderBy(e => e.Student.Name)
+                .OrderBy(e => e.Student.StudentId)
                 .Select(e => new EnrolledStudent
                 {
                     StudentId = e.Student.Id,
@@ -567,7 +646,7 @@ namespace RollCall.Controllers
 
             TempData["ToastMessage"] = "Session started successfully!";
             TempData["ToastType"] = "success";
-            return RedirectToAction("SessionDetails", new { sessionId = session.Id });
+            return RedirectToAction("CourseSessions", new { courseId = session.CourseId });
         }
 
 
@@ -823,8 +902,61 @@ namespace RollCall.Controllers
             return RedirectToAction("CourseEnrollments", new { courseId });
         }
 
+        //-------------------UNENROLL------------------------
 
+        [HttpPost]
+        public async Task<IActionResult> UnenrollStudent(int courseId, int studentId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
 
+            // Only teachers can unenroll
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "Teacher not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Check if the course belongs to this teacher
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == courseId && c.TeacherId == teacher.Id);
+
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            // Find enrollment
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.CourseId == courseId && e.StudentId == studentId);
+
+            if (enrollment == null)
+            {
+                TempData["ToastMessage"] = "Enrollment not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("CourseEnrollments", new { courseId });
+            }
+
+            // Remove enrollment
+            _context.Enrollments.Remove(enrollment);
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Student unenrolled successfully.";
+            TempData["ToastType"] = "success";
+
+            return RedirectToAction("CourseEnrollments", new { courseId });
+        }
 
 
 
