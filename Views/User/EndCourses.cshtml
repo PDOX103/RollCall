@@ -154,6 +154,31 @@
         padding: 30px;
         color: #ecf0f1;
     }
+
+    /* Professional pagination hover effects */
+    .pagination .page-link {
+        transition: all 0.2s ease-in-out;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+        .pagination .page-link:hover {
+            transform: translateY(-2px);
+            background-color: black !important;
+            color: #fff !important;
+        }
+
+    .pagination .active .page-link {
+        font-weight: 600;
+        background-color: black !important;
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .pagination .disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 </style>
 
 <div class="container">
@@ -164,7 +189,7 @@
         </a>
     </div>
 
-    @if (Model.Any())
+    @if (Model.Any(c => !c.IsActive))
     {
         @foreach (var course in Model)
         {
@@ -191,6 +216,49 @@
                 </div>
             </div>
         }
+
+
+
+        <!-- ===== PAGINATION ===== -->
+        <div class="d-flex justify-content-center mt-4">
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <!-- Previous button -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="EndCourses"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+
+                        <!-- Page numbers -->
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a class="page-link rounded-circle mx-1 px-3 py-1
+                                                          @(ViewBag.CurrentPage == i ? "bg-primary text-white" : "bg-light text-dark")"
+                                   asp-action="EndCourses"
+                                   asp-route-page="@i">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Next button -->
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="EndCourses"
+                               asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
     }
     else
     {

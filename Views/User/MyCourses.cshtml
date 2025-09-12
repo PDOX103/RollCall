@@ -61,10 +61,10 @@
         justify-content: flex-end;
     }
 
-    .btn-grad, .btn-grad2, .btn-grad4{
+    .btn-grad, .btn-grad2, .btn-grad4 {
         border: none;
-        padding: 5px 10px;    /* 🔹 smaller padding */
-        font-size: 0.78rem;   /* 🔹 smaller font size */
+        padding: 5px 10px;
+        font-size: 0.78rem;
         font-weight: 500;
         border-radius: 20px;
         display: inline-flex;
@@ -80,8 +80,8 @@
 
     .btn-grad3 {
         border: none;
-        padding: 10px 10px; /* 🔹 smaller padding */
-        font-size: 1rem; /* 🔹 smaller font size */
+        padding: 10px 10px;
+        font-size: 1rem;
         font-weight: 500;
         border-radius: 20px;
         display: inline-flex;
@@ -100,20 +100,20 @@
         color: white;
     }
 
-    .btn-grad:hover {
-        background-position: right center;
-        transform: translateY(-2px);
-    }
+        .btn-grad:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
 
     .btn-grad2 {
         background-image: linear-gradient(to right,#F00000 0%, #DC281E 51%, #F00000 100%);
         color: white;
     }
 
-    .btn-grad2:hover {
-        background-position: right center;
-        transform: translateY(-2px);
-    }
+        .btn-grad2:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
 
     .btn-grad3 {
         background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
@@ -137,35 +137,56 @@
 
     /* ===== MOBILE OPTIMIZATION ===== */
     @@media (max-width: 576px) {
-        .action-buttons
+        .action-buttons {
+            justify-content: center;
+        }
 
-    {
-        justify-content: center;
+        .btn-grad, .btn-grad2 {
+            flex: 1 1 auto;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .course-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .course-code {
+            align-self: flex-start;
+        }
     }
-
-    .btn-grad, .btn-grad2 {
-        flex: 1 1 auto;
-        text-align: center;
-        font-size: 0.8rem;
-        padding: 6px 8px;
-    }
-
-    .course-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .course-code {
-        align-self: flex-start;
-    }
-
-    }
-
 
     .empty-state {
         text-align: center;
         padding: 30px;
         color: #ecf0f1;
+    }
+
+    /* Professional pagination hover effects */
+    .pagination .page-link {
+        transition: all 0.2s ease-in-out;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+        .pagination .page-link:hover {
+            transform: translateY(-2px);
+            background-color: black !important;
+            color: #fff !important;
+        }
+
+    .pagination .active .page-link {
+        font-weight: 600;
+        background-color: black !important;
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .pagination .disabled .page-link {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 </style>
 
@@ -222,6 +243,47 @@
                 </div>
             </div>
         }
+
+        <!-- ===== PAGINATION ===== -->
+        <div class="d-flex justify-content-center mt-4">
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <!-- Previous button -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="MyCourses"
+                               asp-route-page="@(ViewBag.CurrentPage - 1)">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+
+                        <!-- Page numbers -->
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                <a class="page-link rounded-circle mx-1 px-3 py-1
+                                              @(ViewBag.CurrentPage == i ? "bg-primary text-white" : "bg-light text-dark")"
+                                   asp-action="MyCourses"
+                                   asp-route-page="@i">
+                                    @i
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Next button -->
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link rounded-pill px-3"
+                               asp-action="MyCourses"
+                               asp-route-page="@(ViewBag.CurrentPage + 1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
     }
     else
     {

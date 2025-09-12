@@ -316,7 +316,7 @@ namespace RollCall.Controllers
             int pageSize = 5; // show 5 courses per page
 
             var coursesQuery = _context.Courses
-                .Where(c => c.TeacherId == teacher.Id)
+                .Where(c => c.TeacherId == teacher.Id && c.IsActive)
                 .OrderByDescending(c => c.CreatedAt); // latest courses first
 
             var totalCourses = await coursesQuery.CountAsync();
@@ -359,7 +359,7 @@ namespace RollCall.Controllers
 
         // ---------------- VIEW ENDED COURSES ----------------
         [HttpGet]
-        public async Task<IActionResult> EndCourses()
+        public async Task<IActionResult> EndCourses(int page = 1)
         {
             var userEmail = HttpContext.Session.GetString("UserEmail");
             var userRole = HttpContext.Session.GetString("UserRole");
@@ -380,14 +380,27 @@ namespace RollCall.Controllers
                 return RedirectToAction("SignIn");
             }
 
-            // Get ended courses
-            var endedCourses = await _context.Courses
+            int pageSize = 5; // show 5 courses per page
+
+            // Get ended courses query
+            var endedCoursesQuery = _context.Courses
                 .Where(c => c.TeacherId == teacher.Id && !c.IsActive)
-                .OrderBy(c => c.EndedAt)  // Requires EndedAt property
+                .OrderBy(c => c.EndedAt); // earliest ended courses first
+
+            var totalCourses = await endedCoursesQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCourses / (double)pageSize);
+
+            var endedCourses = await endedCoursesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(endedCourses);
         }
+
 
 
         // ---------------- ENROLL IN COURSE (GET) ----------------
