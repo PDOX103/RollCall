@@ -271,7 +271,7 @@ namespace RollCall.Controllers
 
                     TempData["ToastMessage"] = $"Course created successfully! Enrollment code: <strong>{uniqueCode}</strong>";
                     TempData["ToastType"] = "success";
-                    return RedirectToAction("TeacherPage");
+                    return RedirectToAction("MyCourses");
                 }
                 catch (Exception ex)
                 {
@@ -485,7 +485,7 @@ namespace RollCall.Controllers
 
                 TempData["ToastMessage"] = $"Successfully enrolled in <strong>{course.Name}</strong> taught by {course.Teacher.Name}!";
                 TempData["ToastType"] = "success";
-                return RedirectToAction("StudentPage");
+                return RedirectToAction("MyEnrollments");
             }
             catch (Exception ex)
             {

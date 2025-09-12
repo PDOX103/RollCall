@@ -3,12 +3,12 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using RollCall.Models;
 using System;
+using System.Collections.Generic;
 
 namespace RollCall.Helpers
 {
     public class AttendancePDFDocument
     {
-      
         static AttendancePDFDocument()
         {
             QuestPDF.Settings.License = LicenseType.Community;
@@ -25,92 +25,158 @@ namespace RollCall.Helpers
 
         public byte[] Generate()
         {
-            try
+            var document = Document.Create(container =>
             {
-                var document = Document.Create(container =>
+                container.Page(page =>
                 {
-                    container.Page(page =>
+                    page.Size(PageSizes.A4);
+                    page.Margin(2, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontColor(Colors.Black));
+
+                    page.Header().Element(ComposeHeader);
+                    page.Content().Element(ComposeContent);
+
+                    page.Footer().AlignCenter().Text(text =>
                     {
-                        page.Size(PageSizes.A4);
-                        page.Margin(2, Unit.Centimetre);
-                        page.PageColor(Colors.White);
-                        page.DefaultTextStyle(x => x.FontSize(12));
-
-                        page.Header().Element(ComposeHeader);
-                        page.Content().Element(ComposeContent);
-
-                        page.Footer().AlignCenter().Text(text =>
-                        {
-                            text.CurrentPageNumber();
-                            text.Span(" / ");
-                            text.TotalPages();
-                        });
+                        text.Span("Generated on ").FontSize(9);
+                        text.Span($"{DateTime.Now:g}").FontSize(9).SemiBold();
+                        text.Line(" ");
+                        text.CurrentPageNumber();
+                        text.Span(" / ");
+                        text.TotalPages();
                     });
                 });
+            });
 
-                return document.GeneratePdf();
-            }
-            catch (Exception ex)
-            {
-                
-                Console.WriteLine($"Error generating PDF: {ex.Message}");
-                throw; 
-            }
+            return document.GeneratePdf();
         }
 
         private void ComposeHeader(IContainer container)
         {
-            container.Row(row =>
+            container.Column(column =>
             {
-                row.RelativeItem().Column(column =>
-                {
-                    column.Item().Text("Roll Call System").FontSize(20).Bold();
-                    column.Item().Text($"Attendance Report: {_session.Course.Name}").FontSize(14);
-                    column.Item().Text($"Session: {_session.StartTime:g} - {(_session.EndTime ?? DateTime.UtcNow):g}").FontSize(10);
-                });
+                column.Item().Text("Roll Call System")
+                    .FontSize(20).Bold().AlignCenter();
+
+                column.Item().Text($"Attendance Report: {_session.Course?.Name ?? "N/A"}")
+                    .FontSize(14).SemiBold().AlignCenter();
+
+                var end = _session.EndTime ?? DateTime.UtcNow;
+                column.Item().Text($"Session: {_session.StartTime:g} - {end:g}")
+                    .FontSize(10).AlignCenter();
+
+                column.Item().PaddingVertical(6).LineHorizontal(1).LineColor(Colors.Grey.Medium);
             });
         }
 
         private void ComposeContent(IContainer container)
         {
-            container.PaddingVertical(20).Column(column =>
+            container.PaddingVertical(10).Column(column =>
             {
-                column.Item().Text($"Total Students: {_records.Count}").FontSize(14).Bold();
+                column.Item().PaddingBottom(6).Text($"Total Students: {_records.Count}")
+                    .FontSize(13).Bold();
 
-                column.Item().PaddingVertical(10).Table(table =>
+                column.Item().PaddingVertical(6).Table(table =>
                 {
+                    // ===== Column Definitions =====
                     table.ColumnsDefinition(columns =>
                     {
-                        columns.ConstantColumn(25);
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
-                        columns.RelativeColumn();
+                        columns.ConstantColumn(40);    // #
+                        columns.ConstantColumn(100);   // Student ID
+                        columns.RelativeColumn(2);     // Name
+                        columns.RelativeColumn(1);     // Section
+                        columns.RelativeColumn(2);     // Email
+                        columns.RelativeColumn(2);     // Marked At
                     });
 
-                    
+                    // ===== Header Row =====
                     table.Header(header =>
                     {
-                        header.Cell().Text("#");
-                        header.Cell().Text("Student ID");
-                        header.Cell().Text("Name");
-                        header.Cell().Text("Email");
-                        header.Cell().Text("Marked At");
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("#").FontColor(Colors.White).SemiBold());
 
-                        header.Cell().Background(Colors.Grey.Lighten2).Padding(5);
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("Student ID").FontColor(Colors.White).SemiBold());
+
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("Name").FontColor(Colors.White).SemiBold());
+
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("Section").FontColor(Colors.White).SemiBold());
+
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("Email").FontColor(Colors.White).SemiBold());
+
+                        header.Cell().Element(cell =>
+                            cell.Background(Colors.Grey.Darken1)
+                                .Padding(6)
+                                .Border(1).BorderColor(Colors.Black)
+                                .AlignCenter()
+                                .Text("Marked At").FontColor(Colors.White).SemiBold());
                     });
 
-                    
+                    // ===== Data Rows =====
                     for (int i = 0; i < _records.Count; i++)
                     {
                         var record = _records[i];
-                        table.Cell().Text((i + 1).ToString());
-                        table.Cell().Text(record.Student.StudentId ?? "N/A");
-                        table.Cell().Text(record.Student.Name);
-                        table.Cell().Text(record.Student.Email);
-                        table.Cell().Text(record.MarkedAt.ToString("g"));
+                        var student = record.Student;
 
-                        table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(5);
+                        // # (center)
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle().AlignCenter()
+                                .Text((i + 1).ToString()));
+
+                        // Student ID
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle()
+                                .Text(student?.StudentId ?? "N/A"));
+
+                        // Name (left)
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle()
+                                .Text(student?.Name ?? "N/A"));
+
+                        // Section (center-ish)
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle().AlignCenter()
+                                .Text(student?.Section ?? "N/A"));
+
+                        // Email (left)
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle()
+                                .Text(student?.Email ?? "N/A"));
+
+                        // Marked At (center)
+                        table.Cell().Element(cell =>
+                            cell.Border(1).BorderColor(Colors.Grey.Lighten2)
+                                .Padding(6).AlignMiddle().AlignCenter()
+                                .Text(record.MarkedAt.ToString("g")));
                     }
                 });
             });
