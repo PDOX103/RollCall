@@ -902,8 +902,61 @@ namespace RollCall.Controllers
             return RedirectToAction("CourseEnrollments", new { courseId });
         }
 
+        //-------------------UNENROLL------------------------
 
+        [HttpPost]
+        public async Task<IActionResult> UnenrollStudent(int courseId, int studentId)
+        {
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
 
+            // Only teachers can unenroll
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Teacher")
+            {
+                TempData["ToastMessage"] = "Access denied. Teacher access required.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (teacher == null)
+            {
+                TempData["ToastMessage"] = "Teacher not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("SignIn");
+            }
+
+            // Check if the course belongs to this teacher
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == courseId && c.TeacherId == teacher.Id);
+
+            if (course == null)
+            {
+                TempData["ToastMessage"] = "Course not found or access denied.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("MyCourses");
+            }
+
+            // Find enrollment
+            var enrollment = await _context.Enrollments
+                .FirstOrDefaultAsync(e => e.CourseId == courseId && e.StudentId == studentId);
+
+            if (enrollment == null)
+            {
+                TempData["ToastMessage"] = "Enrollment not found.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("CourseEnrollments", new { courseId });
+            }
+
+            // Remove enrollment
+            _context.Enrollments.Remove(enrollment);
+            await _context.SaveChangesAsync();
+
+            TempData["ToastMessage"] = "Student unenrolled successfully.";
+            TempData["ToastType"] = "success";
+
+            return RedirectToAction("CourseEnrollments", new { courseId });
+        }
 
 
 
