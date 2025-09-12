@@ -5,179 +5,312 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 20px;
+        margin: 15px auto;
+        backdrop-filter: blur(10px);
+        max-width: 1000px;
+    }
+
+    .session-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .session-status-active {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .session-status-ended {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-grad {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #232526 0%, #414345 51%, #232526 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: white;
+    }
+
+        .btn-grad:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .btn-grad3 {
+        border: none;
+        padding: 10px 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: black;
+    }
+
+        .btn-grad3:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    @@media (max-width: 576px) {
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .btn-grad {
+            flex: 1 1 auto;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .session-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .session-status-active, .session-status-ended {
+            align-self: flex-start;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: #ecf0f1;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2>Sessions for @Model.Course.Name</h2>
-        <a asp-controller="User" asp-action="MyCourses" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Back to My Courses
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-controller="User" asp-action="MyCourses" class="btn-grad3 mt-2 mt-sm-0">
+                <i class="fas fa-arrow-left"></i> Back to My Courses
+            </a>
+        </div>
     </div>
 
-    @Html.AntiForgeryToken()  <!-- required for AJAX POSTs -->
+    @Html.AntiForgeryToken()
     @if (Model.Sessions.Any())
     {
-        <div class="list-group">
-            @foreach (var session in Model.Sessions)
-            {
-                var plannedIso = session.PlannedEndTime.HasValue ? session.PlannedEndTime.Value.ToString("o") : "";
-                <div class="list-group-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-1">
-                                Session @session.Id
-                                @if (session.IsActive)
-                                {
-                                    <span class="badge bg-success ms-2">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary ms-2">Ended</span>
-                                }
-                            </h5>
-                            <p class="mb-1">Started: @session.StartTime.ToLocalTime().ToString("g")</p>
-                            @if (session.PlannedEndTime.HasValue)
+        @foreach (var session in Model.Sessions)
+        {
+            var plannedIso = session.PlannedEndTime.HasValue ? session.PlannedEndTime.Value.ToString("o") : "";
+            <div class="session-card">
+                <div class="session-header">
+                    <h4 class="mb-0">Session @session.Id</h4>
+                    <span class="@(session.IsActive ? "session-status-active" : "session-status-ended")" id="status-@session.Id">
+                        @(session.IsActive ? "Active" : "Ended")
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">Started: @session.StartTime.ToLocalTime().ToString("g")</p>
+                        @if (session.PlannedEndTime.HasValue)
+                        {
+                            <p class="mb-1">Planned End: @session.PlannedEndTime.Value.ToLocalTime().ToString("g")</p>
+                        }
+
+                        <div id="countdown-@session.Id" data-session-id="@session.Id" data-planned="@plannedIso" data-active="@(session.IsActive.ToString().ToLower())" style="min-width:160px;">
+                            @if (session.IsActive && session.PlannedEndTime.HasValue)
                             {
-                                <p class="mb-1">Planned End: @session.PlannedEndTime.Value.ToLocalTime().ToString("g")</p>
+                                <small class="text-muted">Loading countdown…</small>
+                            }
+                            else if (!session.IsActive)
+                            {
+                                <small class="text-muted">Session ended</small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">No end time set</small>
                             }
                         </div>
-
-                        <div class="text-end">
-                            <div id="countdown-@session.Id" data-session-id="@session.Id" data-planned="@plannedIso" data-active="@(session.IsActive.ToString().ToLower())" style="min-width:160px;">
-                                @if (session.IsActive && session.PlannedEndTime.HasValue)
-                                {
-                                    <small class="text-muted">Loading countdown…</small>
-                                }
-                                else if (!session.IsActive)
-                                {
-                                    <small class="text-muted">Session ended</small>
-                                }
-                                else
-                                {
-                                    <small class="text-muted">No end time set</small>
-                                }
-                            </div>
-
-                            <a asp-controller="User" asp-action="SessionDetails" asp-route-sessionId="@session.Id" class="btn btn-primary btn-sm mt-2">
-                                <i class="fas fa-eye"></i> View Details
-                            </a>
-                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        
+                        <a asp-controller="User" asp-action="SessionDetails" asp-route-sessionId="@session.Id" class="btn-grad">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
                     </div>
                 </div>
-            }
-        </div>
+            </div>
+        }
     }
     else
     {
-        <div class="empty-state text-center py-5">
-            <i class="fas fa-clock fa-3x mb-3 text-muted"></i>
-            <h5>No sessions yet</h5>
+        <div class="empty-state">
+            <i class="fas fa-clock fa-3x mb-3"></i>
+            <h4>No sessions yet</h4>
             <p>Start a new session to track attendance.</p>
+            <a asp-controller="User" asp-action="StartSession" asp-route-courseId="@Model.Course.Id" class="btn-grad3">
+                <i class="fas fa-plus"></i> Start New Session
+            </a>
         </div>
     }
 </div>
 
-<script>
-    (function () {
-        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
-        const csrfToken = tokenInput ? tokenInput.value : null;
+@section Scripts {
+    <script>
+        (function () {
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const csrfToken = tokenInput ? tokenInput.value : null;
 
-        function initCountdown(element) {
-            const sessionId = element.dataset.sessionId;
-            const plannedIso = element.dataset.planned;
-            let isActive = element.dataset.active === "true";
-            let plannedDate = plannedIso ? new Date(plannedIso) : null;
+            function initCountdown(element) {
+                const sessionId = element.dataset.sessionId;
+                const plannedIso = element.dataset.planned;
+                let isActive = element.dataset.active === "true";
+                let plannedDate = plannedIso ? new Date(plannedIso) : null;
 
-            let countdownTimer = null;
-            let pollTimer = null;
+                let countdownTimer = null;
+                let pollTimer = null;
 
-            function stopAll() {
-                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-                if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
-            }
+                function stopAll() {
+                    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+                }
 
-            async function fetchStatus() {
-                try {
-                    const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
-                    if (!resp.ok) return;
-                    const json = await resp.json();
-                    // server returns ISO strings
-                    isActive = !!json.isActive;
-                    element.dataset.active = isActive ? "true" : "false";
+                async function fetchStatus() {
+                    try {
+                        const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
+                        if (!resp.ok) return;
+                        const json = await resp.json();
+                        isActive = !!json.isActive;
+                        element.dataset.active = isActive ? "true" : "false";
 
-                    if (json.plannedEndTime) {
-                        plannedDate = new Date(json.plannedEndTime);
+                        if (json.plannedEndTime) {
+                            plannedDate = new Date(json.plannedEndTime);
+                        }
+
+                        if (!isActive) {
+                            element.innerHTML = '<span class="text-muted">Session ended</span>';
+                            stopAll();
+                        }
+                    } catch (err) {
+                        console.warn('status fetch failed', err);
                     }
+                }
 
+                async function autoEndSessionOnExpiry() {
+                    if (!csrfToken) return;
+                    try {
+                        const formData = new FormData();
+                        formData.append('sessionId', sessionId);
+
+                        const resp = await fetch('/User/EndSessionAjax', {
+                            method: 'POST',
+                            headers: { 'RequestVerificationToken': csrfToken },
+                            body: formData
+                        });
+                        if (!resp.ok) return;
+                        const json = await resp.json();
+                        if (json.success) {
+                            isActive = false;
+                            element.innerHTML = '<span class="text-muted">Session ended</span>';
+                            stopAll();
+                        }
+                    } catch (err) {
+                        console.error('auto-end failed', err);
+                    }
+                }
+
+                function updateCountdown() {
                     if (!isActive) {
                         element.innerHTML = '<span class="text-muted">Session ended</span>';
                         stopAll();
+                        return;
                     }
-                } catch (err) {
-                    console.warn('status fetch failed', err);
-                }
-            }
+                    if (!plannedDate) {
+                        element.innerHTML = '<small class="text-muted">No end time set</small>';
+                        return;
+                    }
 
-            async function autoEndSessionOnExpiry() {
-                // call EndSessionAjax to mark ended on server
-                if (!csrfToken) return;
-                try {
-                    const formData = new FormData();
-                    formData.append('sessionId', sessionId);
-
-                    const resp = await fetch('/User/EndSessionAjax', {
-                        method: 'POST',
-                        headers: { 'RequestVerificationToken': csrfToken },
-                        body: formData
-                    });
-                    if (!resp.ok) return;
-                    const json = await resp.json();
-                    if (json.success) {
-                        isActive = false;
-                        element.innerHTML = '<span class="text-muted">Session ended</span>';
+                    const now = new Date();
+                    const diff = plannedDate - now;
+                    if (diff <= 0) {
+                        element.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
                         stopAll();
+                        autoEndSessionOnExpiry();
+                        return;
                     }
-                } catch (err) {
-                    console.error('auto-end failed', err);
+
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                    const seconds = Math.floor((diff / 1000) % 60);
+
+                    element.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
                 }
+
+                updateCountdown();
+                countdownTimer = setInterval(updateCountdown, 1000);
+                pollTimer = setInterval(fetchStatus, 5000);
             }
 
-            function updateCountdown() {
-                if (!isActive) {
-                    element.innerHTML = '<span class="text-muted">Session ended</span>';
-                    stopAll();
-                    return;
-                }
-                if (!plannedDate) {
-                    element.innerHTML = '<small class="text-muted">No end time set</small>';
-                    return;
-                }
-
-                const now = new Date();
-                const diff = plannedDate - now;
-                if (diff <= 0) {
-                    element.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
-                    stopAll();
-                    autoEndSessionOnExpiry(); // call server to set final EndTime/IsActive
-                    return;
-                }
-
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff / (1000 * 60)) % 60);
-                const seconds = Math.floor((diff / 1000) % 60);
-
-                element.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-            }
-
-            // initial update
-            updateCountdown();
-
-            // every second update countdown
-            countdownTimer = setInterval(updateCountdown, 1000);
-
-            // poll status every 5s to detect manual End from other clients
-            pollTimer = setInterval(fetchStatus, 5000);
-        }
-
-        document.querySelectorAll('[data-session-id]').forEach(el => initCountdown(el));
-    })();
-</script>
+            document.querySelectorAll('[data-session-id]').forEach(el => initCountdown(el));
+        })();
+    </script>
+}

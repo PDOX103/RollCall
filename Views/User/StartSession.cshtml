@@ -5,25 +5,114 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<div class="form-card container" style="max-width:600px; margin-top:30px;">
-    <h3 class="text-center mb-4">Start New Attendance Session</h3>
-    <form asp-action="StartSession" method="post">
-        @Html.AntiForgeryToken()
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
 
-        <input type="hidden" asp-for="CourseId" />
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 20px;
+        margin: 30px auto;
+        backdrop-filter: blur(10px);
+        max-width: 600px;
+    }
 
-        <div class="mb-3">
-            <label asp-for="CourseId" class="form-label">Course</label>
-            <input asp-for="CourseId" class="form-control" readonly />
-        </div>
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
 
-        <div class="mb-3">
-            <label asp-for="PlannedEndTime" class="form-label">Planned End Time (optional)</label>
-            <!-- datetime-local will bind; on POST controller converts to UTC -->
-            <input asp-for="PlannedEndTime" type="datetime-local" class="form-control" />
-            <div class="form-text">Set an end time (local). If provided, session will auto-end when countdown reaches zero.</div>
-        </div>
+    .btn-grad3 {
+        border: none;
+        padding: 10px 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: black;
+        width: 100%;
+        justify-content: center;
+    }
 
-        <button type="submit" class="btn btn-primary w-100">Start Session</button>
-    </form>
+        .btn-grad3:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .form-label {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        background: #f8f9fa;
+        color: #2c3e50;
+    }
+
+    .form-text {
+        color: #2c3e50;
+    }
+
+    @@media (max-width: 576px) {
+        .container {
+            padding: 15px;
+            margin: 15px auto;
+        }
+
+        .form-card {
+            padding: 15px;
+        }
+
+        .btn-grad3 {
+            font-size: 0.9rem;
+            padding: 8px 10px;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="form-card">
+        <h3 class="text-center mb-4">Start New Attendance Session</h3>
+        <form asp-action="StartSession" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="CourseId" />
+
+            <div class="mb-3">
+                <label asp-for="CourseId" class="form-label">Course</label>
+                <input asp-for="CourseId" class="form-control" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PlannedEndTime" class="form-label">Planned End Time (optional)</label>
+                <input asp-for="PlannedEndTime" type="datetime-local" class="form-control" />
+                <div class="form-text">Set an end time (local). If provided, session will auto-end when countdown reaches zero.</div>
+            </div>
+
+            <button type="submit" class="btn-grad3">
+                <i class="fas fa-play"></i> Start Session
+            </button>
+        </form>
+    </div>
 </div>
