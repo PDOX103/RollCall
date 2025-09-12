@@ -141,8 +141,6 @@
                         {
                             <p class="mb-1">Planned End: @session.PlannedEndTime.Value.ToLocalTime().ToString("g")</p>
                         }
-                    </div>
-                    <div class="action-buttons">
                         <div id="countdown-student-@session.Id" data-session-id="@session.Id" data-planned="@plannedIso" data-active="@(session.IsActive.ToString().ToLower())" style="min-width:160px;">
                             @if (session.PlannedEndTime.HasValue)
                             {
@@ -153,6 +151,9 @@
                                 <small class="text-muted">No end time set</small>
                             }
                         </div>
+                    </div>
+                    <div class="action-buttons">
+                        
                         <form asp-action="MarkAttendance" method="post" class="d-inline">
                             <input type="hidden" name="sessionId" value="@session.Id" />
                             <button type="submit" class="btn-grad4" id="mark-btn-@session.Id">
