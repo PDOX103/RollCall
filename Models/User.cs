@@ -33,5 +33,7 @@ namespace RollCall.Models
 
         // Teacher-specific
         public string? Designation { get; set; }
+
+
     }
 }
