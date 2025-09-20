@@ -1,0 +1,29 @@
+﻿@model IEnumerable<RollCall.Controllers.DashboardVM>
+
+@{
+    ViewData["Title"] = "Attendance Dashboard";
+}
+
+<h2 class="text-xl font-bold mb-4">📊 Attendance Dashboard</h2>
+
+<table class="table-auto w-full border border-gray-300 rounded-lg shadow">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="p-2 border">Course</th>
+            <th class="p-2 border">Total Sessions</th>
+            <th class="p-2 border">Attended</th>
+            <th class="p-2 border">Attendance %</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="p-2 border">@item.CourseName</td>
+                <td class="p-2 border">@item.TotalSessions</td>
+                <td class="p-2 border">@item.AttendedSessions</td>
+                <td class="p-2 border font-bold">@item.AttendancePercentage %</td>
+            </tr>
+        }
+    </tbody>
+</table>
