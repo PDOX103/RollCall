@@ -1,5 +1,4 @@
 ﻿@model RollCall.Models.ViewModels.CourseEnrollmentsVM
-
 @{
     ViewData["Title"] = "Course Enrollments";
 }
@@ -17,155 +16,372 @@
         color: #fff;
     }
 
-    .container {
+    .content {
+        padding: 50px;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 1rem;
-        padding: 30px;
-        margin: 20px auto;
+        margin: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         backdrop-filter: blur(10px);
-        max-width: 1200px;
     }
 
-    .card {
+    /* ===== CARD STYLES ===== */
+    .course-card {
         background: rgba(255, 255, 255, 0.95);
         color: #2c3e50;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        padding: 50px;
+        margin-bottom: 25px;
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        width: 100%;
+        overflow-x: auto;
     }
 
-    .table-responsive {
-        background: white;
-        border-radius: 0.5rem;
-        overflow: hidden;
+    .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
-    .table th {
-        background: #3a7bd5;
-        color: white;
-        border: none;
-    }
-
-    .table td {
-        vertical-align: middle;
-    }
-
-    .badge-enrollment {
+    .course-code {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 5px 15px;
+        padding: 5px 14px;
         border-radius: 20px;
         font-weight: bold;
+        font-size: 0.85em;
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 40px;
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-grad, .btn-grad2, .btn-grad3 {
+        border: none;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-size: 200% auto;
+        cursor: pointer;
+    }
+
+        .btn-grad:hover, .btn-grad2:hover, .btn-grad3:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-grad {
+        background-image: linear-gradient(to right, #232526 0%, #414345 51%, #232526 100%);
+        color: white;
+    }
+
+    .btn-grad2 {
+        background-image: linear-gradient(to right, #F00000 0%, #DC281E 51%, #F00000 100%);
+        color: white;
+    }
+
+    .btn-grad3 {
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        color: black;
+    }
+
+    /* ===== SEARCH BAR ===== */
+    .search-box {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+        .search-box input {
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            outline: none;
+            width: 250px;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .search-box input:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 6px rgba(102, 126, 234, 0.6);
+            }
+
+    /* ===== TABLE ===== */
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+        .table th, .table td {
+            padding: 14px 18px;
+            text-align: left;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+    .table-hover tbody tr:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Badges */
+    .badge-pass, .badge-fail, .badge-na {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    .badge-pass {
+        background: linear-gradient(to right, #28a745 0%, #218838 51%, #28a745 100%);
+        color: white;
+    }
+
+    .badge-fail {
+        background: linear-gradient(to right, #dc3545 0%, #c82333 51%, #dc3545 100%);
+        color: white;
+    }
+
+    .badge-na {
+        background: linear-gradient(to right, #6c757d 0%, #5a6268 51%, #6c757d 100%);
+        color: white;
+    }
+
+    /* Modal */
+    .modal-content {
+        background: rgba(255, 255, 255, 0.95);
         color: #2c3e50;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .course-card
+
+    {
+        padding: 25px;
+    }
+
+    .search-box {
+        justify-content: center;
+    }
+
+        .search-box input {
+            width: 100%;
+        }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table th, .table td {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+
+    .btn-grad, .btn-grad2, .btn-grad3 {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+    }
+
     }
 </style>
 
-<div class="container">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="content">
+    <div class="course-header">
         <div>
             <h2>@Model.CourseName - Enrolled Students</h2>
-            <p class="text-light mb-0">Course Code: <span class="badge-enrollment">@Model.CourseCode</span></p>
+            <p class="mb-0">Course Code: <span class="course-code">@Model.CourseCode</span></p>
         </div>
-        <div>
-            <a asp-controller="User" asp-action="MyCourses" class="btn btn-outline-light">
+        <div class="action-buttons">
+            <a asp-controller="User" asp-action="MyCourses" class="btn-grad3">
                 <i class="fas fa-arrow-left"></i> Back to My Courses
             </a>
         </div>
     </div>
 
-    <!-- Enrollment Stats -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <h3 class="text-primary">@Model.EnrolledStudents.Count</h3>
-                    <p class="text-muted mb-0">Total Students</p>
-                </div>
-                <div class="col-md-4">
-                    <h3 class="text-success">@Model.EnrolledStudents.Count(s => !string.IsNullOrEmpty(s.PhoneNumber) && s.PhoneNumber != "N/A")</h3>
-                    <p class="text-muted mb-0">With Phone Numbers</p>
-                </div>
-                <div class="col-md-4">
-                    <h3 class="text-info">@Model.EnrolledStudents.Count(s => !string.IsNullOrEmpty(s.Section) && s.Section != "N/A")</h3>
-                    <p class="text-muted mb-0">With Section Info</p>
+    <div class="course-card">
+        @if (Model.EnrolledStudents.Any())
+        {
+            <!-- ✅ Search box -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by Student ID or Name..." />
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover" id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Section</th>
+                            <th>Department</th>
+                            <th>Enrolled On</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                            <th>Grade Action</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.EnrolledStudents)
+                        {
+                            <tr>
+                                <td><strong>@student.StudentIdNumber</strong></td>
+                                <td>@student.Name</td>
+                                <td>@student.Email</td>
+                                <td>@student.PhoneNumber</td>
+                                <td>@student.Section</td>
+                                <td>@student.Department</td>
+                                <td>@student.EnrolledAt.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    @if (student.Grade.HasValue)
+                                    {
+                                        <span>@student.Grade.Value</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not assigned</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (student.Grade.HasValue && student.Grade.Value < 2.0)
+                                    {
+                                        <span class="badge-fail">FAIL</span>
+                                    }
+                                    else if (student.Grade.HasValue)
+                                    {
+                                        <span class="badge-pass">PASS</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-na">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button" class="btn-grad3 btn-sm" data-bs-toggle="modal" data-bs-target="#gradeModal-@student.StudentId">
+                                        <i class="fas fa-edit"></i> Assign Grade
+                                    </button>
+                                </td>
+                                <td>
+                                    <form asp-controller="User" asp-action="UnenrollStudent" method="post" style="display:inline;">
+                                        <input type="hidden" name="courseId" value="@Model.CourseId" />
+                                        <input type="hidden" name="studentId" value="@student.StudentId" />
+                                        <button type="submit" class="btn-grad2 btn-sm" onclick="return confirm('Are you sure you want to unenroll @student.Name?');">
+                                            <i class="fas fa-user-times"></i> Unenroll
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state text-center">
+                <i class="fas fa-users-slash fa-3x mb-3 text-muted"></i>
+                <h4>No students enrolled yet</h4>
+                <p class="text-muted">Students can enroll using the course code: <strong class="course-code">@Model.CourseCode</strong></p>
+                <div class="action-buttons">
+                    <button class="btn-grad3" onclick="copyToClipboard('@Model.CourseCode')">
+                        <i class="fas fa-copy"></i> Copy Enrollment Code
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Students Table -->
-    <div class="card">
-        <div class="card-body">
-            @if (Model.EnrolledStudents.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Section</th>
-                                <th>Department</th>
-                                <th>Enrolled On</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var student in Model.EnrolledStudents)
-                            {
-                                <tr>
-                                    <td><strong>@student.StudentIdNumber</strong></td>
-                                    <td>@student.Name</td>
-                                    <td>@student.Email</td>
-                                    <td>@student.PhoneNumber</td>
-                                    <td>@student.Section</td>
-                                    <td>@student.Department</td>
-                                    <td>@student.EnrolledAt.ToString("MMM dd, yyyy")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="empty-state">
-                    <i class="fas fa-users-slash fa-3x mb-3 text-muted"></i>
-                    <h4>No students enrolled yet</h4>
-                    <p class="text-muted">Students can enroll using the course code: <strong>@Model.CourseCode</strong></p>
-                    <div class="mt-3">
-                        <button class="btn btn-primary" onclick="copyToClipboard('@Model.CourseCode')">
-                            <i class="fas fa-copy"></i> Copy Enrollment Code
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
+        }
     </div>
 </div>
 
+@foreach (var student in Model.EnrolledStudents)
+{
+    <div class="modal fade" id="gradeModal-@student.StudentId" tabindex="-1" aria-labelledby="gradeModalLabel-@student.StudentId" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-controller="User" asp-action="AssignGrade" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="gradeModalLabel-@student.StudentId">Assign Grade for @student.Name</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="courseId" value="@Model.CourseId" />
+                        <input type="hidden" name="studentId" value="@student.StudentId" />
+                        <div class="mb-3">
+                            <label for="grade-@student.StudentId" class="form-label">Grade</label>
+                            <input type="number" step="any" min="0" max="4" class="form-control" id="grade-@student.StudentId" name="grade" value="@(student.Grade?.ToString() ?? "")" required />
+                            <div class="form-text">Enter a grade between 0.0 and 4.0</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-grad" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn-grad3">Save Grade</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
 @section Scripts {
     <script>
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(function() {
-                // Show feedback
-                const originalText = event.target.innerHTML;
-                event.target.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                event.target.classList.remove('btn-primary');
-                event.target.classList.add('btn-success');
+        // ✅ Live search filter
+        document.getElementById("searchInput").addEventListener("keyup", function () {
+            var filter = this.value.toLowerCase();
+            var rows = document.querySelectorAll("#studentsTable tbody tr");
 
-                // Revert after 2 seconds
+            rows.forEach(function (row) {
+                var studentId = row.cells[0].textContent.toLowerCase();
+                var name = row.cells[1].textContent.toLowerCase();
+
+                if (studentId.includes(filter) || name.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+
+        // Copy course code
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function () {
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
                 setTimeout(() => {
-                    event.target.innerHTML = originalText;
-                    event.target.classList.remove('btn-success');
-                    event.target.classList.add('btn-primary');
+                    button.innerHTML = originalText;
                 }, 2000);
-            }).catch(function(err) {
+            }).catch(function (err) {
                 alert('Failed to copy: ' + err);
             });
         }

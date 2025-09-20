@@ -1,0 +1,48 @@
+﻿@model RollCall.Models.ViewModels.CourseSessionsVM
+@{
+    ViewData["Title"] = "Course Sessions";
+}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Sessions for @Model.Course.Name</h2>
+        <a asp-controller="User" asp-action="MyCourses" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to My Courses
+        </a>
+    </div>
+
+    @if (Model.Sessions.Any())
+    {
+        @foreach (var session in Model.Sessions)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">
+                                Session @(session.IsActive ? "<span class='badge bg-success'>Active</span>" : "<span class='badge bg-secondary'>Ended</span>")
+                            </h5>
+                            <p class="card-text">
+                                Started: @session.StartTime.ToString("g")<br />
+                                @if (session.EndTime.HasValue)
+                                {
+                                    <text>Ended: @session.EndTime.Value.ToString("g")</text>
+                                }
+                            </p>
+                        </div>
+                        <a asp-controller="User" asp-action="SessionDetails" asp-route-sessionId="@session.Id" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-clock fa-3x mb-3"></i>
+            <h5>No sessions yet</h5>
+            <p>Start a new session to track attendance.</p>
+        </div>
+    }
+</div>

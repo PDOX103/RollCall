@@ -21,67 +21,178 @@
         background: rgba(255, 255, 255, 0.1);
         border-radius: 1rem;
         margin: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         backdrop-filter: blur(10px);
     }
 
-    .card {
+    /* ===== CARD STYLES ===== */
+    .course-card {
         background: rgba(255, 255, 255, 0.95);
         color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    .card-title {
-        color: #2c3e50;
-        font-weight: bold;
+    .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 6px;
     }
+
+    /* ===== ACTION BUTTONS WRAPPER ===== */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    /* ===== BUTTON STYLES ===== */
+    .btn-grad, .btn-grad2, .btn-grad3, .btn-grad4 {
+        border: none;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+    }
+
+    /* Slightly larger variant for main actions */
+    .btn-grad3 {
+        padding: 10px 18px;
+        font-size: 1rem;
+    }
+
+    /* Black/Grey gradient */
+    .btn-grad {
+        background-image: linear-gradient(to right, #232526 0%, #414345 51%, #232526 100%);
+        color: white;
+    }
+
+        .btn-grad:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    /* Red gradient */
+    .btn-grad2 {
+        background-image: linear-gradient(to right, #F00000 0%, #DC281E 51%, #F00000 100%);
+        color: white;
+    }
+
+        .btn-grad2:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    /* Blue gradient */
+    .btn-grad3 {
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        color: black;
+    }
+
+        .btn-grad3:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    /* Yellow/Orange gradient */
+    .btn-grad4 {
+        background-image: linear-gradient(to right, #ffb347 0%, #ffcc33 51%, #ffb347 100%);
+        color: black;
+    }
+
+        .btn-grad4:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
 </style>
 
-<div>
-    <div class="content">
-        <h2>Welcome, @Model.Name!</h2>
-        <p>You are logged in as <strong>Student</strong>.</p>
+<div class="content">
+    <h2>Welcome, @Model?.Name!</h2>
+    <p>This is your Student Dashboard. Here you can enroll in courses, view your enrollments, and manage active sessions.</p>
 
-        <!-- Student Details Card -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Your Details</h5>
-                <p><strong>Student ID:</strong> @Model.StudentId</p>
-                <p><strong>Section:</strong> @Model.Section</p>
-                <p><strong>Department:</strong> @Model.Department</p>
-                <p><strong>Email:</strong> @Model.Email</p>
-                <p><strong>Phone:</strong> @Model.PhoneNumber</p>
-            </div>
-        </div>
-
-        <!-- Enrollment Management Cards -->
-        <div class="row mt-4">
-            <div class="col-md-6 mb-3">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-plus-circle fa-3x mb-3 text-primary"></i>
-                        <h5 class="card-title">Enroll in Course</h5>
-                        <p class="card-text">Use an enrollment code from your instructor to join a course.</p>
-                        <a asp-controller="User" asp-action="EnrollInCourse" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Enroll Now
-                        </a>
-                    </div>
+    <div class="row mt-4">
+        <!-- Enroll in Course -->
+        <div class="col-md-6 mb-3">
+            <div class="course-card h-100 text-center">
+                <div class="course-header justify-content-center">
+                    <h5 class="card-title">Enroll in Course</h5>
                 </div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-book fa-3x mb-3 text-success"></i>
-                        <h5 class="card-title">My Enrollments</h5>
-                        <p class="card-text">View all the courses you're enrolled in.</p>
-                        <a asp-controller="User" asp-action="MyEnrollments" class="btn btn-success">
-                            <i class="fas fa-eye"></i> View Enrollments
-                        </a>
-                    </div>
+                <i class="fas fa-plus-circle fa-3x mb-3"></i>
+                <p class="card-text">Use an enrollment code from your instructor to join a course.</p>
+                <div class="action-buttons">
+                    <a asp-controller="User" asp-action="EnrollInCourse" class="btn-grad3">
+                        <i class="fas fa-plus"></i> Enroll Now
+                    </a>
                 </div>
             </div>
         </div>
-        <!-- End of Enrollment Cards -->
 
+        <!-- My Enrollments -->
+        <div class="col-md-6 mb-3">
+            <div class="course-card h-100 text-center">
+                <div class="course-header justify-content-center">
+                    <h5 class="card-title">My Enrollments</h5>
+                </div>
+                <i class="fas fa-book fa-3x mb-3"></i>
+                <p class="card-text">View all the courses you're enrolled in.</p>
+                <div class="action-buttons">
+                    <a asp-controller="User" asp-action="MyEnrollments" class="btn-grad3">
+                        <i class="fas fa-eye"></i> View Enrollments
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Sessions -->
+        <div class="col-md-6 mb-3">
+            <div class="course-card h-100 text-center">
+                <div class="course-header justify-content-center">
+                    <h5 class="card-title">Active Sessions</h5>
+                </div>
+                <i class="fas fa-clock fa-3x mb-3"></i>
+                <p class="card-text">View and mark attendance for active sessions.</p>
+                <div class="action-buttons">
+                    <a asp-controller="User" asp-action="ActiveSessions" class="btn-grad3">
+                        <i class="fas fa-eye"></i> View Active Sessions
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    // Optional dark mode toggle logic
+    const modeBtn = document.querySelector(".mode-btn");
+    document.addEventListener("DOMContentLoaded", () => {
+        const savedMode = localStorage.getItem("darkMode");
+        if (savedMode === "true") {
+            document.body.classList.add("dark-mode");
+            if(modeBtn) modeBtn.textContent = "☀️ Light Mode";
+        } else {
+            if(modeBtn) modeBtn.textContent = "🌙 Dark Mode";
+        }
+    });
+    function toggleMode() {
+        document.body.classList.toggle("dark-mode");
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", isDark);
+        if(modeBtn) modeBtn.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+    }
+</script>

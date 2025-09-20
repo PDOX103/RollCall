@@ -1,0 +1,447 @@
+﻿@model RollCall.Models.ViewModels.SessionDetailsVM
+@{
+    ViewData["Title"] = "Session Details";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 20px;
+        margin: 15px auto;
+        backdrop-filter: blur(10px);
+        max-width: 1000px;
+    }
+
+    .session-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .session-status-active {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .session-status-ended {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-grad {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #232526 0%, #414345 51%, #232526 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: white;
+    }
+
+        .btn-grad:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .btn-grad2 {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #F00000 0%, #DC281E 51%, #F00000 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: white;
+    }
+
+        .btn-grad2:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .btn-grad3 {
+        border: none;
+        padding: 10px 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: black;
+    }
+
+        .btn-grad3:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .btn-grad4 {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #28a745 0%, #218838 51%, #28a745 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: white;
+    }
+
+        .btn-grad4:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .countdown-container {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .table-responsive {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .table th, .table td {
+        color: #2c3e50;
+    }
+
+    @@media (max-width: 576px) {
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .btn-grad, .btn-grad2, .btn-grad4 {
+            flex: 1 1 auto;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .session-status-active, .session-status-ended {
+            align-self: flex-start;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: #ecf0f1;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2>Session Details for @Model.Session.Course.Name</h2>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-controller="User" asp-action="CourseSessions" asp-route-courseId="@Model.Session.CourseId" class="btn-grad3 mt-2 mt-sm-0">
+                <i class="fas fa-arrow-left"></i> Back to Sessions
+            </a>
+        </div>
+    </div>
+
+    @Html.AntiForgeryToken()
+
+    <div class="session-card">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <p>
+                    <strong>Status:</strong>
+                    <span id="session-status" class="@(Model.Session.IsActive ? "session-status-active" : "session-status-ended")">
+                        @(Model.Session.IsActive ? "Active" : "Ended")
+                    </span>
+                </p>
+                <p><strong>Start Time:</strong> @Model.Session.StartTime.ToLocalTime().ToString("g")</p>
+                <div id="planned-end-block">
+                    @if (Model.Session.PlannedEndTime.HasValue)
+                    {
+                        <p><strong>Planned End Time:</strong> <span id="planned-end">@Model.Session.PlannedEndTime.Value.ToLocalTime().ToString("g")</span></p>
+                    }
+                    else
+                    {
+                        <p id="no-planned-end"><strong>Planned End Time:</strong> <em>Not set</em></p>
+                    }
+                </div>
+                <div id="countdown-container" class="countdown-container">
+                    @if (Model.Session.PlannedEndTime.HasValue && Model.Session.IsActive)
+                    {
+                        <div id="countdown">Loading countdown…</div>
+                    }
+                    else if (!Model.Session.IsActive)
+                    {
+                        <div id="countdown">Session ended</div>
+                    }
+                    else
+                    {
+                        <div id="countdown">No end time set</div>
+                    }
+                </div>
+            </div>
+            <div class="action-buttons">
+                @if (Model.Session.IsActive)
+                {
+                    <form id="endSessionForm" asp-action="EndSession" method="post" class="d-inline">
+                        <input type="hidden" name="sessionId" value="@Model.Session.Id" />
+                        <button type="submit" class="btn-grad2 mb-2">
+                            <i class="fas fa-stop"></i> End Session
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Session.IsActive)
+    {
+        <div class="session-card">
+            <div>
+                <h5>Edit Planned End Time</h5>
+                <form asp-action="UpdateEndTime" method="post" id="updateEndTimeForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="sessionId" value="@Model.Session.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">New End Time</label>
+                        <input name="newEndTime" type="datetime-local" class="form-control" required />
+                        <div class="form-text">Pick a future end time (local).</div>
+                    </div>
+                    <button type="submit" class="btn-grad3">Update End Time</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    <div class="session-card">
+        <div>
+            <h4>Attendance Records (@Model.Records.Count)</h4>
+            @if (Model.Records.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Section</th>
+                                <th>Email</th>
+                                <th>Marked At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Records.Count; i++)
+                            {
+                                var record = Model.Records[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>@record.Student.StudentId</td>
+                                    <td>@record.Student.Name</td>
+                                    <td>@record.Student.Section</td>
+                                    <td>@record.Student.Email</td>
+                                    <td>@record.MarkedAt.ToLocalTime().ToString("g")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (!Model.Session.IsActive)
+                {
+                    <a asp-action="GeneratePDF" asp-route-sessionId="@Model.Session.Id" class="btn-grad4 mt-3">
+                        <i class="fas fa-file-pdf"></i> Generate PDF Report
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-users-slash fa-3x mb-3"></i>
+                    <h4>No attendance records yet</h4>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const sessionId = "@Model.Session.Id";
+            const initialPlannedIso = "@(Model.Session.PlannedEndTime?.ToString("o") ?? "")";
+            let plannedDate = initialPlannedIso ? new Date(initialPlannedIso) : null;
+            let isActive = @(Model.Session.IsActive.ToString().ToLower());
+            const csrfTokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const csrfToken = csrfTokenInput ? csrfTokenInput.value : null;
+
+            const countdownEl = document.getElementById('countdown');
+            const statusEl = document.getElementById('session-status');
+            const plannedEndDisplay = document.getElementById('planned-end');
+            const noPlannedBlock = document.getElementById('no-planned-end');
+
+            let countdownTimer = null;
+            let pollTimer = null;
+
+            function stopAll() {
+                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+            }
+
+            async function fetchStatus() {
+                try {
+                    const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
+                    if (!resp.ok) return;
+                    const j = await resp.json();
+                    isActive = !!j.isActive;
+                    if (j.plannedEndTime) {
+                        plannedDate = new Date(j.plannedEndTime);
+                        if (plannedEndDisplay) plannedEndDisplay.textContent = plannedDate.toLocaleString();
+                        if (noPlannedBlock) noPlannedBlock.style.display = 'none';
+                    }
+
+                    if (!isActive) {
+                        if (statusEl) {
+                            statusEl.className = 'session-status-ended';
+                            statusEl.textContent = 'Ended';
+                        }
+                        if (countdownEl) countdownEl.innerHTML = 'Session ended';
+                        stopAll();
+                    }
+                } catch (e) {
+                    console.warn('status fetch error', e);
+                }
+            }
+
+            async function endSessionAjax() {
+                if (!csrfToken) return;
+                try {
+                    const fd = new FormData();
+                    fd.append('sessionId', sessionId);
+                    const resp = await fetch('/User/EndSessionAjax', {
+                        method: 'POST',
+                        headers: { 'RequestVerificationToken': csrfToken },
+                        body: fd
+                    });
+                    if (!resp.ok) return;
+                    const json = await resp.json();
+                    if (json.success) {
+                        isActive = false;
+                        if (statusEl) {
+                            statusEl.className = 'session-status-ended';
+                            statusEl.textContent = 'Ended';
+                        }
+                        if (countdownEl) countdownEl.innerHTML = 'Session ended';
+                        stopAll();
+                    }
+                } catch (err) {
+                    console.error('endSessionAjax error', err);
+                }
+            }
+
+            function updateCountdown() {
+                if (!isActive) {
+                    countdownEl.innerHTML = 'Session ended';
+                    stopAll();
+                    return;
+                }
+                if (!plannedDate) {
+                    countdownEl.innerHTML = 'No end time set';
+                    return;
+                }
+                const now = new Date();
+                const diff = plannedDate - now;
+                if (diff <= 0) {
+                    countdownEl.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
+                    stopAll();
+                    endSessionAjax();
+                    return;
+                }
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+                countdownEl.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+            }
+
+            if (isActive && plannedDate) {
+                updateCountdown();
+                countdownTimer = setInterval(updateCountdown, 1000);
+                pollTimer = setInterval(fetchStatus, 4000);
+            } else {
+                pollTimer = setInterval(fetchStatus, 8000);
+            }
+
+            const endForm = document.getElementById('endSessionForm');
+            if (endForm) {
+                endForm.addEventListener('submit', () => {
+                    stopAll();
+                });
+            }
+        })();
+    </script>
+}

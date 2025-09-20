@@ -1,4 +1,4 @@
-﻿@model List<RollCall.Models.Enrollment>
+﻿@model List<RollCall.Models.ViewModels.StudentEnrollmentVM>
 
 @{
     ViewData["Title"] = "My Enrollments";
@@ -20,8 +20,8 @@
     .container {
         background: rgba(255, 255, 255, 0.1);
         border-radius: 1rem;
-        padding: 30px;
-        margin: 20px auto;
+        padding: 20px;
+        margin: 15px auto;
         backdrop-filter: blur(10px);
         max-width: 1000px;
     }
@@ -31,25 +31,138 @@
         color: #2c3e50;
         border-radius: 10px;
         padding: 20px;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .enrollment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-grad3 {
+        border: none;
+        padding: 10px 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: black;
+    }
+
+        .btn-grad3:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .btn-grad {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #232526 0%, #414345 51%, #232526 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: white;
+    }
+
+        .btn-grad:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+    .status-pass {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .status-fail {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .status-no-grade {
+        background: linear-gradient(135deg, #6c757d 0%, #6c757d 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    @@media (max-width: 576px) {
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .btn-grad, .btn-grad3 {
+            flex: 1 1 auto;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .enrollment-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .status-pass, .status-fail, .status-no-grade {
+            align-self: flex-start;
+        }
     }
 
     .empty-state {
         text-align: center;
-        padding: 40px;
+        padding: 30px;
         color: #ecf0f1;
     }
 </style>
 
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2>My Course Enrollments</h2>
-        <div>
-            <a asp-action="EnrollInCourse" class="btn btn-primary me-2">
+        <div class="action-buttons">
+            <a asp-action="EnrollInCourse" class="btn-grad3 mt-2 mt-sm-0">
                 <i class="fas fa-plus"></i> Enroll in New Course
             </a>
-            <a asp-action="StudentPage" class="btn btn-outline-secondary">
+            <a asp-action="StudentPage" class="btn-grad3 mt-2 mt-sm-0">
                 <i class="fas fa-home"></i> Dashboard
             </a>
         </div>
@@ -57,16 +170,31 @@
 
     @if (Model.Any())
     {
-        foreach (var enrollment in Model)
+        @foreach (var enrollment in Model)
         {
             <div class="enrollment-card">
-                <div class="d-flex justify-content-between align-items-start">
+                <div class="enrollment-header">
+                    <h4 class="mb-0">@enrollment.CourseName</h4>
+                    @if (enrollment.Grade.HasValue)
+                    {
+                        <span class="@(enrollment.Grade.Value < 2.0 ? "status-fail" : "status-pass")">
+                            @(enrollment.Grade.Value < 2.0 ? "FAIL" : "PASS")
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-no-grade">No Grade</span>
+                    }
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="mb-1">@enrollment.Course.Name</h4>
-                        <p class="text-muted mb-1">Taught by: @enrollment.Course.Teacher.Name</p>
+                        <p class="mb-1">Taught by: @enrollment.TeacherName</p>
                         <small class="text-muted">Enrolled: @enrollment.EnrolledAt.ToString("MMM dd, yyyy")</small>
                     </div>
-                    <span class="badge bg-success">Enrolled</span>
+                    @if (enrollment.Grade.HasValue)
+                    {
+                        <span>Grade: @enrollment.Grade.Value</span>
+                    }
                 </div>
             </div>
         }
@@ -77,7 +205,7 @@
             <i class="fas fa-book-open fa-3x mb-3"></i>
             <h4>No course enrollments yet</h4>
             <p>Use an enrollment code from your instructor to join a course.</p>
-            <a asp-action="EnrollInCourse" class="btn btn-primary btn-lg">
+            <a asp-action="EnrollInCourse" class="btn-grad3 btn-lg">
                 <i class="fas fa-plus"></i> Enroll in Your First Course
             </a>
         </div>

@@ -1,7 +1,7 @@
 ﻿@model List<RollCall.Models.Course>
 
 @{
-    ViewData["Title"] = "My Courses";
+    ViewData["Title"] = "Ended Courses";
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -61,7 +61,7 @@
         justify-content: flex-end;
     }
 
-    .btn-grad, .btn-grad2, .btn-grad4 {
+    .btn-grad, .btn-grad2 {
         border: none;
         padding: 5px 10px;
         font-size: 0.78rem;
@@ -80,8 +80,8 @@
 
     .btn-grad3 {
         border: none;
-        padding: 10px 10px;
-        font-size: 1rem;
+        padding: 10px 10px; /* 🔹 smaller padding */
+        font-size: 1rem; /* 🔹 smaller font size */
         font-weight: 500;
         border-radius: 20px;
         display: inline-flex;
@@ -106,7 +106,7 @@
         }
 
     .btn-grad2 {
-        background-image: linear-gradient(to right,#F00000 0%, #DC281E 51%, #F00000 100%);
+        background-image: linear-gradient(to right, #F00000 0%, #DC281E 51%, #F00000 100%);
         color: white;
     }
 
@@ -121,16 +121,6 @@
     }
 
         .btn-grad3:hover {
-            background-position: right center;
-            transform: translateY(-2px);
-        }
-
-    .btn-grad4 {
-        background-image: linear-gradient(to right, #ffb347 0%, #ffcc33 51%, #ffb347 100%);
-        color: black;
-    }
-
-        .btn-grad4:hover {
             background-position: right center;
             transform: translateY(-2px);
         }
@@ -157,6 +147,7 @@
             align-self: flex-start;
         }
     }
+
 
     .empty-state {
         text-align: center;
@@ -192,19 +183,13 @@
 
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h2>My Created Courses</h2>
-        <div class="d-flex gap-2 flex-wrap">
-            <a asp-action="CreateCourse" class="btn-grad3 mt-2 mt-sm-0">
-                <i class="fas fa-plus"></i> Create New Course
-            </a>
-
-            <a asp-action="EndCourses" class="btn-grad3 mt-2 mt-sm-0">
-                <i class="fas fa-eye"></i> View Ended Courses
-            </a>
-        </div>
+        <h2>Ended Courses</h2>
+        <a asp-action="MyCourses" class="btn-grad3 mt-2 mt-sm-0">
+            <i class="fas fa-arrow-left"></i> Back to My Courses
+        </a>
     </div>
 
-    @if (Model.Any(c => c.IsActive))
+    @if (Model.Any(c => !c.IsActive))
     {
         @foreach (var course in Model)
         {
@@ -224,25 +209,15 @@
                         <i class="fas fa-users"></i> View Enrollments
                     </a>
 
-                    <a asp-controller="User" asp-action="StartSession" asp-route-courseId="@course.Id"
-                       class="btn-grad">
-                        <i class="fas fa-clock"></i> Create Session
-                    </a>
-
                     <a asp-controller="User" asp-action="CourseSessions" asp-route-courseId="@course.Id"
                        class="btn-grad">
                         <i class="fas fa-list"></i> View Sessions
                     </a>
-
-                    <form asp-controller="User" asp-action="EndCourse" asp-route-id="@course.Id" method="post" class="d-inline">
-                        <button type="submit" class="btn-grad4"
-                                onclick="return confirm('Are you sure you want to end this course?');">
-                            <i class="fa fa-stop"></i> End Course
-                        </button>
-                    </form>
                 </div>
             </div>
         }
+
+
 
         <!-- ===== PAGINATION ===== -->
         <div class="d-flex justify-content-center mt-4">
@@ -253,7 +228,7 @@
                         <!-- Previous button -->
                         <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
                             <a class="page-link rounded-pill px-3"
-                               asp-action="MyCourses"
+                               asp-action="EndCourses"
                                asp-route-page="@(ViewBag.CurrentPage - 1)">
                                 <i class="fas fa-chevron-left"></i> Previous
                             </a>
@@ -264,8 +239,8 @@
                         {
                             <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
                                 <a class="page-link rounded-circle mx-1 px-3 py-1
-                                              @(ViewBag.CurrentPage == i ? "bg-primary text-white" : "bg-light text-dark")"
-                                   asp-action="MyCourses"
+                                                          @(ViewBag.CurrentPage == i ? "bg-primary text-white" : "bg-light text-dark")"
+                                   asp-action="EndCourses"
                                    asp-route-page="@i">
                                     @i
                                 </a>
@@ -275,7 +250,7 @@
                         <!-- Next button -->
                         <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
                             <a class="page-link rounded-pill px-3"
-                               asp-action="MyCourses"
+                               asp-action="EndCourses"
                                asp-route-page="@(ViewBag.CurrentPage + 1)">
                                 Next <i class="fas fa-chevron-right"></i>
                             </a>
@@ -289,10 +264,10 @@
     {
         <div class="empty-state">
             <i class="fas fa-book-open fa-3x mb-3"></i>
-            <h4>No courses created yet</h4>
-            <p>Create your first course to generate an enrollment code for students.</p>
-            <a asp-action="CreateCourse" class="btn-grad btn-lg">
-                <i class="fas fa-plus"></i> Create Your First Course
+            <h4>No ended courses yet</h4>
+            <p>Courses that you have ended will appear here.</p>
+            <a asp-action="MyCourses" class="btn-grad mt-2">
+                <i class="fas fa-arrow-left"></i> Back to My Courses
             </a>
         </div>
     }

@@ -1,0 +1,248 @@
+﻿@model List<RollCall.Models.AttendanceSession>
+@{
+    ViewData["Title"] = "Active Sessions";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        padding: 20px;
+        margin: 15px auto;
+        backdrop-filter: blur(10px);
+        max-width: 1000px;
+    }
+
+    .session-card {
+        background: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .session-status-active {
+        background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        color: white;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8em;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .btn-grad4 {
+        border: none;
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        white-space: nowrap;
+        background-image: linear-gradient(to right, #00c6ff 0%, #0072ff 51%, #00c6ff 100%);
+        background-size: 200% auto;
+        cursor: pointer;
+        line-height: 1.2;
+        color: black;
+    }
+
+        .btn-grad4:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+        }
+
+        .btn-grad4:disabled {
+            background-image: linear-gradient(to right, #6c757d 0%, #6c757d 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+    @@media (max-width: 576px) {
+        .action-buttons {
+            justify-content: center;
+        }
+
+        .btn-grad4 {
+            flex: 1 1 auto;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 6px 8px;
+        }
+
+        .session-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .session-status-active {
+            align-self: flex-start;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: #ecf0f1;
+    }
+</style>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h2>Active Attendance Sessions</h2>
+    </div>
+
+    @Html.AntiForgeryToken()
+    @if (Model.Any())
+    {
+        @foreach (var session in Model)
+        {
+            var plannedIso = session.PlannedEndTime.HasValue ? session.PlannedEndTime.Value.ToString("o") : "";
+            <div class="session-card">
+                <div class="session-header">
+                    <h4 class="mb-0">@session.Course.Name</h4>
+                    <span class="session-status-active" id="status-@session.Id">Active</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">Started: @session.StartTime.ToLocalTime().ToString("g")</p>
+                        @if (session.PlannedEndTime.HasValue)
+                        {
+                            <p class="mb-1">Planned End: @session.PlannedEndTime.Value.ToLocalTime().ToString("g")</p>
+                        }
+                        <div id="countdown-student-@session.Id" data-session-id="@session.Id" data-planned="@plannedIso" data-active="@(session.IsActive.ToString().ToLower())" style="min-width:160px;">
+                            @if (session.PlannedEndTime.HasValue)
+                            {
+                                <small class="text-muted">Loading...</small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">No end time set</small>
+                            }
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        
+                        <form asp-action="MarkAttendance" method="post" class="d-inline">
+                            <input type="hidden" name="sessionId" value="@session.Id" />
+                            <button type="submit" class="btn-grad4" id="mark-btn-@session.Id">
+                                <i class="fas fa-check"></i> Mark Attendance
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-clock fa-3x mb-3"></i>
+            <h4>No active sessions</h4>
+            <p>Check back later for new attendance sessions.</p>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            function init(el) {
+                const sessionId = el.dataset.sessionId;
+                const plannedIso = el.dataset.planned;
+                let plannedDate = plannedIso ? new Date(plannedIso) : null;
+                let isActive = el.dataset.active === "true";
+                let countdownTimer = null;
+                let pollTimer = null;
+
+                function stopAll() {
+                    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+                }
+
+                async function fetchStatus() {
+                    try {
+                        const resp = await fetch(`/User/SessionStatus?sessionId=${sessionId}`, { method: 'GET', cache: 'no-store' });
+                        if (!resp.ok) return;
+                        const j = await resp.json();
+                        isActive = !!j.isActive;
+                        if (j.plannedEndTime) plannedDate = new Date(j.plannedEndTime);
+
+                        if (!isActive) {
+                            el.innerHTML = '<span class="text-muted">Session ended</span>';
+                            const btn = document.getElementById('mark-btn-' + sessionId);
+                            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> Closed'; }
+                            stopAll();
+                        }
+                    } catch (e) {
+                        console.warn('status fetch', e);
+                    }
+                }
+
+                function update() {
+                    if (!isActive) {
+                        el.innerHTML = '<span class="text-muted">Session ended</span>';
+                        const btn = document.getElementById('mark-btn-' + sessionId);
+                        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> Closed'; }
+                        stopAll();
+                        return;
+                    }
+                    if (!plannedDate) {
+                        el.innerHTML = '<small class="text-muted">No end time set</small>';
+                        return;
+                    }
+                    const now = new Date();
+                    const diff = plannedDate - now;
+                    if (diff <= 0) {
+                        el.innerHTML = '<strong>Time remaining: 00:00:00</strong>';
+                        const btn = document.getElementById('mark-btn-' + sessionId);
+                        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> Closed'; }
+                        stopAll();
+                        return;
+                    }
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                    const seconds = Math.floor((diff / 1000) % 60);
+                    el.innerHTML = `<strong>Time remaining:</strong> ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+                }
+
+                update();
+                countdownTimer = setInterval(update, 1000);
+                pollTimer = setInterval(fetchStatus, 5000);
+            }
+
+            document.querySelectorAll('[data-session-id]').forEach(init);
+        })();
+    </script>
+}
