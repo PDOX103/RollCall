@@ -35,6 +35,22 @@ namespace RollCall.Controllers
         [HttpPost]
         public IActionResult SignIn(string email, string password)
         {
+
+            //Hardcoded Superuser
+            if (email == "admin@gmail.com" && password == "123456")
+            {
+                HttpContext.Session.SetString("UserEmail", email);
+                HttpContext.Session.SetString("UserRole", "Admin"); 
+                HttpContext.Session.SetString("IsSuperUser", "true");
+
+                _logger.LogInformation("UserEmail: {Email}, UserRole: {Role}",
+    HttpContext.Session.GetString("UserEmail"),
+    HttpContext.Session.GetString("UserRole"));
+
+                TempData["Message"] = "Logged in as Superuser!";
+                return RedirectToAction("AdminPage"); 
+            }
+
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
             if (user == null)
@@ -44,7 +60,7 @@ namespace RollCall.Controllers
                 return View();
             }
 
-            if (user.PasswordHash != password) // replace with hashing in production
+            if (user.PasswordHash != password) 
             {
                 TempData["Message"] = "Wrong password!";
                 TempData["MessageType"] = "error";
@@ -55,7 +71,7 @@ namespace RollCall.Controllers
             HttpContext.Session.SetString("UserEmail", user.Email);
             HttpContext.Session.SetString("UserRole", user.Role);
 
-            //TempData["Message"] = "Signed in successfully!";
+            TempData["Message"] = "Signed in successfully!";
             //TempData["MessageType"] = "success";
 
             // Redirect based on role
@@ -161,8 +177,28 @@ namespace RollCall.Controllers
         public IActionResult AdminPage()
         {
             var userEmail = HttpContext.Session.GetString("UserEmail");
-            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail && u.Role == "Admin");
-            if (user == null) return RedirectToAction("SignIn");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            // Log the accessed information
+            _logger.LogInformation("AdminPage accessed by {Email} with role {Role}", userEmail, userRole);
+
+            if (string.IsNullOrEmpty(userEmail) || userRole != "Admin")
+            {
+                TempData["Message"] = "Access denied.";
+                return RedirectToAction("SignIn");
+            }
+
+            // Retrieve user from the database
+            var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+
+            // Log the retrieved user information
+            _logger.LogInformation("User retrieved: {User}", user);
+
+            if (user == null)
+            {
+                return RedirectToAction("SignIn");
+            }
+
             return View(user);
         }
 
@@ -1068,6 +1104,56 @@ namespace RollCall.Controllers
             return RedirectToAction("CourseEnrollments", new { courseId });
         }
 
+
+       
+        
+
+        // ---------------- MANAGE USERS ----------------
+        public IActionResult ManageUsers()
+        {
+            var users = _context.Users.ToList(); // Fetch all users
+            return View(users); // Pass the user list to the view
+        }
+
+
+        // ---------------- EDIT USER (GET) ----------------
+        [HttpGet]
+        public IActionResult EditUser(int id)
+        {
+            var user = _context.Users.Find(id);
+            if (user == null) return NotFound();
+            return View(user);
+        }
+
+        // ---------------- EDIT USER (POST) ----------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditUser(User model)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Users.Update(model);
+                _context.SaveChanges();
+                TempData["Message"] = "User updated successfully!";
+                return RedirectToAction("ManageUsers");
+            }
+            return View(model);
+        }
+
+        // ---------------- DELETE USER ----------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteUser(int id)
+        {
+            var user = _context.Users.Find(id);
+            if (user == null) return NotFound();
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+
+            TempData["Message"] = "User deleted successfully!";
+            return RedirectToAction("ManageUsers");
+        }
 
 
 

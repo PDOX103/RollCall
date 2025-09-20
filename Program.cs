@@ -38,6 +38,8 @@ app.UseRouting();
 app.UseSession(); // Must come before UseAuthorization
 // ------------------------------------------------------
 
+
+
 app.UseAuthorization();
 
 // Map default route to User controller
