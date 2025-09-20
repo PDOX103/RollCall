@@ -4,26 +4,174 @@
     ViewData["Title"] = "Attendance Dashboard";
 }
 
-<h2 class="text-xl font-bold mb-4">📊 Attendance Dashboard</h2>
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        background: #0f0c29;
+        background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        background: linear-gradient(to right, #24243e, #302b63, #0f0c29);
+        font-family: 'Poppins', sans-serif;
+        color: white;
+    }
 
-<table class="table-auto w-full border border-gray-300 rounded-lg shadow">
-    <thead class="bg-gray-100">
-        <tr>
-            <th class="p-2 border">Course</th>
-            <th class="p-2 border">Total Sessions</th>
-            <th class="p-2 border">Attended</th>
-            <th class="p-2 border">Attendance %</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td class="p-2 border">@item.CourseName</td>
-                <td class="p-2 border">@item.TotalSessions</td>
-                <td class="p-2 border">@item.AttendedSessions</td>
-                <td class="p-2 border font-bold">@item.AttendancePercentage %</td>
-            </tr>
+    .dashboard-container {
+        width: 80%;
+        margin: 40px auto;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+        .dashboard-container h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
         }
-    </tbody>
-</table>
+
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dashboard-table th {
+            background: rgba(255, 255, 255, 0.15);
+            font-weight: bold;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .dashboard-table td {
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        .dashboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-table .highlight {
+            font-weight: bold;
+        }
+
+        .dashboard-table .low-attendance {
+            color: #ff4d4d; /* Red for < 60% */
+        }
+
+        .dashboard-table .high-attendance {
+            color: #4dff4d; /* Green for >= 60% */
+        }
+
+        .dashboard-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transition: background 0.3s;
+        }
+
+    /* Responsive design for mobile */
+    @@media screen and (max-width: 768px) {
+        .dashboard-container
+
+    {
+        width: 90%;
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .dashboard-container h2 {
+        font-size: 20px;
+    }
+
+    .dashboard-table {
+        display: block;
+        overflow-x: auto; /* Enable horizontal scrolling for table */
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 10px;
+            font-size: 12px;
+            min-width: 100px; /* Ensure columns don't collapse too much */
+        }
+
+        .dashboard-table th {
+            font-size: 14px;
+        }
+
+    h1 {
+        font-size: 24px;
+        margin-top: 15px;
+    }
+
+    }
+
+    @@media screen and (max-width: 480px) {
+        .dashboard-container
+
+    {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .dashboard-container h2 {
+        font-size: 18px;
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        padding: 8px;
+        font-size: 11px;
+        min-width: 80px;
+    }
+
+    .dashboard-table th {
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 20px;
+        margin-top: 10px;
+    }
+
+    }
+</style>
+
+<h1 style="text-align:center; color:white; margin-top:20px;">@ViewData["Title"]</h1>
+
+<div class="dashboard-container">
+    <h2>📊 Attendance Dashboard</h2>
+    <table class="dashboard-table">
+        <thead>
+            <tr>
+                <th>Course</th>
+                <th>Total Sessions</th>
+                <th>Attended</th>
+                <th>Attendance %</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CourseName</td>
+                    <td>@item.TotalSessions</td>
+                    <td>@item.AttendedSessions</td>
+                    <td class="highlight @(item.AttendancePercentage < 60 ? "low-attendance" : "high-attendance")">@item.AttendancePercentage %</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
