@@ -1109,7 +1109,7 @@ namespace RollCall.Controllers
 
 
         // ---------------- MANAGE USERS ----------------
-        public IActionResult ManageUsers(string role)
+        public IActionResult ManageUsers(string role, string dept)
         {
             var users = _context.Users.AsQueryable();
 
@@ -1118,10 +1118,24 @@ namespace RollCall.Controllers
                 users = users.Where(u => u.Role == role);
             }
 
-            ViewBag.SelectedRole = role; // for highlighting active button
+            if (!string.IsNullOrEmpty(dept))
+            {
+                users = users.Where(u => u.Department == dept);
+            }
+
+            // Send departments list to view (for dropdown)
+            ViewBag.Departments = _context.Users
+                .Select(u => u.Department)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToList();
+
+            ViewBag.SelectedRole = role;
+            ViewBag.SelectedDept = dept;
 
             return View(users.ToList());
         }
+
 
 
 
