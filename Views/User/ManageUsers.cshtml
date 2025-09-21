@@ -3,39 +3,48 @@
     ViewData["Title"] = "Manage Users";
     var selectedRole = ViewBag.SelectedRole as string;
     var selectedDept = ViewBag.SelectedDept as string;
-    var departments = ViewBag.Departments as List<string>; // will come from controller
+    var departments = ViewBag.Departments as List<string>;
 }
+<style>
+    body {
+        background-color: #2B1B4D;
+    }
+    h2 {
+        color: white;
+    }
+    .btn-group, .form-inline, .table, .form-select {
+        margin: 5px;
+    }
+    th {
+        background-color: #f8f9fa;
+    }
+</style>
 
 <h2>Manage Users</h2>
-
 <!-- Role Filter Buttons -->
 <div class="btn-group mb-3">
     <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Teacher"
        class="btn btn-primary @(selectedRole == "Teacher" ? "active" : "")">Teachers</a>
-
     <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Student"
        class="btn btn-primary @(selectedRole == "Student" ? "active" : "")">Students</a>
-
     <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Admin"
        class="btn btn-primary @(selectedRole == "Admin" ? "active" : "")">Admins</a>
-
     <a asp-controller="User" asp-action="ManageUsers"
        class="btn btn-secondary @(string.IsNullOrEmpty(selectedRole) ? "active" : "")">All</a>
 </div>
-
 <!-- Department Filter -->
-<form asp-controller="User" asp-action="ManageUsers" method="get" class="mb-3">
+<form asp-controller="User" asp-action="ManageUsers" method="get" class="mb-3 form-inline">
     <input type="hidden" name="role" value="@selectedRole" /> <!-- keep role filter active -->
     <select name="dept" class="form-select form-select-sm" style="width:auto;display:inline;">
         <option value="">-- All Departments --</option>
         @foreach (var dept in departments)
         {
+            
             <option value="@dept" selected="@(selectedDept == dept)">@dept</option>
         }
     </select>
     <button type="submit" class="btn btn-sm btn-info">Filter by Dept</button>
 </form>
-
 <!-- User Table -->
 <table class="table">
     <thead>
@@ -66,7 +75,6 @@
                         </select>
                         <button type="submit" class="btn btn-sm btn-success">Update</button>
                     </form>
-
                     <!-- Delete Form -->
                     <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>

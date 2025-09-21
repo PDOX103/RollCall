@@ -2,15 +2,32 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
+<style>
+    body {
+        background-color: #2B1B4D;
+    }
+
+    .card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+</style>
 
 <div class="container mt-5">
-    <h2>Welcome, Admin @Model.Name!</h2>
-    <p>You are logged in as <strong>Administrator</strong>.</p>
-
+    <h2 class="text-white">Welcome, Admin @Model.Name!</h2>
+    <p class="text-white">You are logged in as <strong>Administrator</strong>.</p>
     <div class="card mt-4">
         <div class="card-body">
             <h5 class="card-title">Admin Controls</h5>
-            <ul>
+            <ul class="list-unstyled">
                 <li><a asp-controller="User" asp-action="ManageUsers" class="btn btn-primary">Manage Users</a></li>
             </ul>
         </div>
