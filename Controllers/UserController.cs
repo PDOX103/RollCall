@@ -1105,15 +1105,26 @@ namespace RollCall.Controllers
         }
 
 
-       
-        
+
+
 
         // ---------------- MANAGE USERS ----------------
-        public IActionResult ManageUsers()
+        public IActionResult ManageUsers(string role)
         {
-            var users = _context.Users.ToList(); // Fetch all users
-            return View(users); // Pass the user list to the view
+            var users = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                users = users.Where(u => u.Role == role);
+            }
+
+            ViewBag.SelectedRole = role; // for highlighting active button
+
+            return View(users.ToList());
         }
+
+
+
 
 
         // ---------------- EDIT USER (GET) ----------------
@@ -1155,6 +1166,21 @@ namespace RollCall.Controllers
             return RedirectToAction("ManageUsers");
         }
 
+
+        [HttpPost]
+        public IActionResult UpdateRole(int id, string role)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Role = role;
+            _context.SaveChanges();   // save role update
+
+            return RedirectToAction("ManageUsers");
+        }
 
 
 

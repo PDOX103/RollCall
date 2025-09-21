@@ -1,9 +1,24 @@
 ﻿@model IEnumerable<RollCall.Models.User>
 @{
     ViewData["Title"] = "Manage Users";
+    var selectedRole = ViewBag.SelectedRole as string;
 }
 
 <h2>Manage Users</h2>
+
+<div class="btn-group mb-3">
+    <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Teacher"
+       class="btn btn-primary @(selectedRole == "Teacher" ? "active" : "")">Teachers</a>
+
+    <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Student"
+       class="btn btn-primary @(selectedRole == "Student" ? "active" : "")">Students</a>
+
+    <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Admin"
+       class="btn btn-primary @(selectedRole == "Admin" ? "active" : "")">Admins</a>
+
+    <a asp-controller="User" asp-action="ManageUsers"
+       class="btn btn-secondary @(string.IsNullOrEmpty(selectedRole) ? "active" : "")">All</a>
+</div>
 
 <table class="table">
     <thead>
@@ -20,11 +35,23 @@
             <tr>
                 <td>@user.Name</td>
                 <td>@user.Email</td>
-                <td>@user.Role</td>
                 <td>
-                    <a asp-action="EditUser" asp-route-id="@user.Id">Edit</a>
+                    <form asp-action="UpdateRole" asp-controller="User" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <select name="role" class="form-select form-select-sm" style="width:auto;display:inline;">
+                            <option value="Teacher" selected="@(user.Role == "Teacher")">Teacher</option>
+                            <option value="Student" selected="@(user.Role == "Student")">Student</option>
+                            <option value="Admin" selected="@(user.Role == "Admin")">Admin</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-success">Update</button>
+                    </form>
+
+
+                </td>
+                <td>
+                    
                     <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" style="display:inline;">
-                        <button type="submit">Delete</button>
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                     </form>
                 </td>
             </tr>
