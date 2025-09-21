@@ -2,10 +2,13 @@
 @{
     ViewData["Title"] = "Manage Users";
     var selectedRole = ViewBag.SelectedRole as string;
+    var selectedDept = ViewBag.SelectedDept as string;
+    var departments = ViewBag.Departments as List<string>; // will come from controller
 }
 
 <h2>Manage Users</h2>
 
+<!-- Role Filter Buttons -->
 <div class="btn-group mb-3">
     <a asp-controller="User" asp-action="ManageUsers" asp-route-role="Teacher"
        class="btn btn-primary @(selectedRole == "Teacher" ? "active" : "")">Teachers</a>
@@ -20,12 +23,27 @@
        class="btn btn-secondary @(string.IsNullOrEmpty(selectedRole) ? "active" : "")">All</a>
 </div>
 
+<!-- Department Filter -->
+<form asp-controller="User" asp-action="ManageUsers" method="get" class="mb-3">
+    <input type="hidden" name="role" value="@selectedRole" /> <!-- keep role filter active -->
+    <select name="dept" class="form-select form-select-sm" style="width:auto;display:inline;">
+        <option value="">-- All Departments --</option>
+        @foreach (var dept in departments)
+        {
+            <option value="@dept" selected="@(selectedDept == dept)">@dept</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-sm btn-info">Filter by Dept</button>
+</form>
+
+<!-- User Table -->
 <table class="table">
     <thead>
         <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Department</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -35,7 +53,10 @@
             <tr>
                 <td>@user.Name</td>
                 <td>@user.Email</td>
+                <td>@user.Role</td>
+                <td>@user.Department</td>
                 <td>
+                    <!-- Role Update Form -->
                     <form asp-action="UpdateRole" asp-controller="User" method="post" style="display:inline;">
                         <input type="hidden" name="id" value="@user.Id" />
                         <select name="role" class="form-select form-select-sm" style="width:auto;display:inline;">
@@ -46,10 +67,7 @@
                         <button type="submit" class="btn btn-sm btn-success">Update</button>
                     </form>
 
-
-                </td>
-                <td>
-                    
+                    <!-- Delete Form -->
                     <form asp-action="DeleteUser" asp-route-id="@user.Id" method="post" style="display:inline;">
                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                     </form>
